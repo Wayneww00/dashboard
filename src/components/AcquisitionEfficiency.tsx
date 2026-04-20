@@ -161,7 +161,7 @@ export default function AcquisitionEfficiency() {
                 <div className={`w-6 h-6 rounded-full ${barColor} text-white flex items-center justify-center text-xs font-bold shrink-0`}>
                   {step.step}
                 </div>
-                <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-400 flex items-center justify-center shrink-0">
                   <Icon size={16} />
                 </div>
                 <div>
@@ -186,7 +186,7 @@ export default function AcquisitionEfficiency() {
               {/* Col 3: Step CVR */}
               <div className="text-center font-bold text-sm">
                 {step.stepCvr ? (
-                  <span className={step.stepCvr >= 70 ? 'text-emerald-600' : step.stepCvr > 50 ? 'text-orange-500' : 'text-rose-600'}>
+                  <span className={step.stepCvr >= 70 ? 'text-emerald-400' : step.stepCvr > 50 ? 'text-orange-500' : 'text-rose-600'}>
                     {step.stepCvr.toFixed(1)}%
                   </span>
                 ) : (
@@ -199,24 +199,18 @@ export default function AcquisitionEfficiency() {
                 {step.cumCvr === 100 ? (
                   <span className="text-gray-700">100%</span>
                 ) : (
-                  <span className="text-emerald-600">{step.cumCvr.toFixed(1)}%</span>
+                  <span className="text-emerald-400">{step.cumCvr.toFixed(1)}%</span>
                 )}
               </div>
 
               {/* Col 5: Dropoff */}
               <div className="text-right pr-4 flex flex-col items-end justify-center gap-1">
                 {step.dropoff ? (
-                  <>
-                    <div className="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md flex items-center gap-0.5">
-                      ↓ {step.dropoff.toLocaleString()}
-                    </div>
-                    <span className="text-[10px] text-gray-500 font-medium">({step.dropoffPct?.toFixed(1)}%)</span>
-                  </>
+                  <div className="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md flex items-center gap-0.5">
+                    ↓ {step.dropoff.toLocaleString()}
+                  </div>
                 ) : (
-                  <>
-                    <div className="text-gray-400 text-sm font-bold">—</div>
-                    <div className="text-gray-400 text-sm font-bold">—</div>
-                  </>
+                  <div className="text-gray-400 text-sm font-bold pl-2">—</div>
                 )}
               </div>
             </div>
@@ -227,7 +221,7 @@ export default function AcquisitionEfficiency() {
       {/* Legend */}
       <div className="flex items-center gap-6 mb-6 px-4 text-xs font-medium text-gray-600">
         <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+          <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
           健康 (≥70%)
         </div>
         <div className="flex items-center gap-1.5">
@@ -286,21 +280,21 @@ export default function AcquisitionEfficiency() {
         </div>
 
         {/* Right Card: Actions */}
-        <div className="bg-emerald-50/30 p-5 rounded-2xl border border-emerald-100/60 group hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
-          <div className="flex items-center gap-2 text-emerald-600 font-bold mb-4 text-[10px] uppercase tracking-widest">
+        <div className="bg-emerald-50/30 p-5 rounded-2xl border border-emerald-100/60 group hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300">
+          <div className="flex items-center gap-2 text-emerald-400 font-bold mb-4 text-[10px] uppercase tracking-widest">
             <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+              <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
             </div>
             建议动作 (Next Actions)
           </div>
 
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <span className="px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded mt-0.5">P1</span>
+              <span className="px-1.5 py-0.5 bg-emerald-400 text-white text-[10px] font-bold rounded mt-0.5">P1</span>
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-bold text-gray-900">优化 KYC → FTD (入金转化)</span>
-                  <span className="text-[10px] text-emerald-600 bg-emerald-50/50 border border-emerald-200/60 px-1.5 py-0.5 rounded">优先级最高</span>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-50/50 border border-emerald-200/60 px-1.5 py-0.5 rounded">优先级最高</span>
                 </div>
                 <ul className="text-xs text-gray-600 list-disc pl-4 space-y-0.5">
                   <li>优化入金流程，减少操作步骤</li>
@@ -314,7 +308,7 @@ export default function AcquisitionEfficiency() {
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-bold text-gray-900">优化 FTD → FTT (首交易激活)</span>
-                  <span className="text-[10px] text-emerald-600 bg-emerald-50/50 border border-emerald-200/60 px-1.5 py-0.5 rounded">优先级高</span>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-50/50 border border-emerald-200/60 px-1.5 py-0.5 rounded">优先级高</span>
                 </div>
                 <ul className="text-xs text-gray-600 list-disc pl-4 space-y-0.5">
                   <li>提供新手引导，降低交易门槛</li>
@@ -328,7 +322,7 @@ export default function AcquisitionEfficiency() {
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-bold text-gray-900">深度拆解定位问题来源</span>
-                  <span className="text-[10px] text-emerald-600 bg-emerald-50/50 border border-emerald-200/60 px-1.5 py-0.5 rounded">优先级中</span>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-50/50 border border-emerald-200/60 px-1.5 py-0.5 rounded">优先级中</span>
                 </div>
                 <ul className="text-xs text-gray-600 list-disc pl-4 space-y-0.5">
                   <li>按渠道 (Paid / IB / Organic) 拆解漏斗</li>

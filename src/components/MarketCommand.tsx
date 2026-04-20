@@ -46,27 +46,27 @@ const MarketCommand = () => {
 
   // 2. 模拟国家数据
   const countriesData = useMemo(() => [
-    { id: 'US', name: '美国', coords: { top: '35%', left: '15%' }, tier: 1, aso: { val: 2800, delta: 85, growth: 3.1 }, geo: { val: 92, delta: 2, growth: 2.2 }, seo: { val: 3200, delta: 120, growth: 3.8 }, comps: ['Exness', 'Capital.com'] },
-    { id: 'CA', name: '加拿大', coords: { top: '25%', left: '16%' }, tier: 2, aso: { val: 850, delta: -12, growth: -1.4 }, geo: { val: 85, delta: -1, growth: -1.2 }, seo: { val: 920, delta: 25, growth: 2.8 }, comps: ['Plus500', 'Capital.com'] },
-    { id: 'MX', name: '墨西哥', coords: { top: '48%', left: '16%' }, tier: 2, aso: { val: 720, delta: -45, growth: -5.9 }, geo: { val: 55, delta: -4, growth: -6.7 }, seo: { val: 410, delta: -12, growth: -2.8 }, comps: ['CFI', 'Exness'] },
-    { id: 'GB', name: '英国', coords: { top: '28%', left: '46%' }, tier: 1, aso: { val: 1100, delta: 15, growth: 1.4 }, geo: { val: 89, delta: 1, growth: 1.1 }, seo: { val: 1350, delta: 45, growth: 3.4 }, comps: ['Capital.com', 'Plus500'] },
-    { id: 'DE', name: '德国', coords: { top: '32%', left: '50%' }, tier: 1, aso: { val: 1400, delta: -35, growth: -2.4 }, geo: { val: 82, delta: -3, growth: -3.5 }, seo: { val: 1650, delta: -20, growth: -1.2 }, comps: ['Plus500', 'Capital.com'] },
-    { id: 'FR', name: '法国', coords: { top: '36%', left: '47%' }, tier: 2, aso: { val: 820, delta: 20, growth: 2.5 }, geo: { val: 78, delta: 2, growth: 2.6 }, seo: { val: 980, delta: 40, growth: 4.3 }, comps: ['Exness', 'CFI'] },
-    { id: 'ES', name: '西班牙', coords: { top: '41%', left: '45%' }, tier: 2, aso: { val: 650, delta: -12, growth: -1.8 }, geo: { val: 72, delta: -1, growth: -1.4 }, seo: { val: 710, delta: 15, growth: 2.1 }, comps: ['Plus500', 'Exness'] },
-    { id: 'CN', name: '中国', coords: { top: '40%', left: '78%' }, tier: 1, aso: { val: 3200, delta: 210, growth: 7.0 }, geo: { val: 88, delta: 2, growth: 2.3 }, seo: { val: 4500, delta: 380, growth: 9.2 }, comps: ['Exness', 'Capital.com'] },
-    { id: 'JP', name: '日本', coords: { top: '38%', left: '88%' }, tier: 1, aso: { val: 1950, delta: -85, growth: -4.2 }, geo: { val: 78, delta: -5, growth: -6.0 }, seo: { val: 1210, delta: -35, growth: -2.8 }, comps: ['Exness', 'CFI'] },
-    { id: 'IN', name: '印度', coords: { top: '50%', left: '71%' }, tier: 1, aso: { val: 2450, delta: 320, growth: 15.0 }, geo: { val: 72, delta: 14, growth: 24.1 }, seo: { val: 1850, delta: 280, growth: 17.8 }, comps: ['PU Prime', 'Exness'] },
-    { id: 'VN', name: '越南', coords: { top: '55%', left: '79.5%' }, tier: 2, aso: { val: 1850, delta: 350, growth: 23.3 }, geo: { val: 75, delta: 18, growth: 31.6 }, seo: { val: 920, delta: 145, growth: 18.7 }, comps: ['PU Prime', 'Exness'] },
+    { id: 'US', name: '美国', coords: { top: '38%', left: '22%' }, tier: 1, aso: { val: 2800, delta: 85, growth: 3.1 }, geo: { val: 92, delta: 2, growth: 2.2 }, seo: { val: 3200, delta: 120, growth: 3.8 }, comps: ['Exness', 'Capital.com'] },
+    { id: 'CA', name: '加拿大', coords: { top: '25%', left: '22%' }, tier: 2, aso: { val: 850, delta: -12, growth: -1.4 }, geo: { val: 85, delta: -1, growth: -1.2 }, seo: { val: 920, delta: 25, growth: 2.8 }, comps: ['Plus500', 'Capital.com'] },
+    { id: 'MX', name: '墨西哥', coords: { top: '48%', left: '20%' }, tier: 2, aso: { val: 720, delta: -45, growth: -5.9 }, geo: { val: 55, delta: -4, growth: -6.7 }, seo: { val: 410, delta: -12, growth: -2.8 }, comps: ['CFI', 'Exness'] },
+    { id: 'GB', name: '英国', coords: { top: '28%', left: '48.5%' }, tier: 1, aso: { val: 1100, delta: 15, growth: 1.4 }, geo: { val: 89, delta: 1, growth: 1.1 }, seo: { val: 1350, delta: 45, growth: 3.4 }, comps: ['Capital.com', 'Plus500'] },
+    { id: 'DE', name: '德国', coords: { top: '29%', left: '52%' }, tier: 1, aso: { val: 1400, delta: -35, growth: -2.4 }, geo: { val: 82, delta: -3, growth: -3.5 }, seo: { val: 1650, delta: -20, growth: -1.2 }, comps: ['Plus500', 'Capital.com'] },
+    { id: 'FR', name: '法国', coords: { top: '32%', left: '49.5%' }, tier: 2, aso: { val: 820, delta: 20, growth: 2.5 }, geo: { val: 78, delta: 2, growth: 2.6 }, seo: { val: 980, delta: 40, growth: 4.3 }, comps: ['Exness', 'CFI'] },
+    { id: 'ES', name: '西班牙', coords: { top: '36%', left: '48%' }, tier: 2, aso: { val: 650, delta: -12, growth: -1.8 }, geo: { val: 72, delta: -1, growth: -1.4 }, seo: { val: 710, delta: 15, growth: 2.1 }, comps: ['Plus500', 'Exness'] },
+    { id: 'CN', name: '中国', coords: { top: '38%', left: '78%' }, tier: 1, aso: { val: 3200, delta: 210, growth: 7.0 }, geo: { val: 88, delta: 2, growth: 2.3 }, seo: { val: 4500, delta: 380, growth: 9.2 }, comps: ['Exness', 'Capital.com'] },
+    { id: 'JP', name: '日本', coords: { top: '37%', left: '86%' }, tier: 1, aso: { val: 1950, delta: -85, growth: -4.2 }, geo: { val: 78, delta: -5, growth: -6.0 }, seo: { val: 1210, delta: -35, growth: -2.8 }, comps: ['Exness', 'CFI'] },
+    { id: 'IN', name: '印度', coords: { top: '48%', left: '71%' }, tier: 1, aso: { val: 2450, delta: 320, growth: 15.0 }, geo: { val: 72, delta: 14, growth: 24.1 }, seo: { val: 1850, delta: 280, growth: 17.8 }, comps: ['PU Prime', 'Exness'] },
+    { id: 'VN', name: '越南', coords: { top: '52%', left: '79%' }, tier: 2, aso: { val: 1850, delta: 350, growth: 23.3 }, geo: { val: 75, delta: 18, growth: 31.6 }, seo: { val: 920, delta: 145, growth: 18.7 }, comps: ['PU Prime', 'Exness'] },
     { id: 'ID', name: '印尼', coords: { top: '62%', left: '81%' }, tier: 2, aso: { val: 1600, delta: 120, growth: 8.1 }, geo: { val: 68, delta: 5, growth: 7.9 }, seo: { val: 840, delta: 60, growth: 7.7 }, comps: ['Exness', 'CFI'] },
-    { id: 'AE', name: '阿联酋', coords: { top: '50%', left: '60%' }, tier: 2, aso: { val: 1550, delta: 245, growth: 18.8 }, geo: { val: 94, delta: 4, growth: 4.4 }, seo: { val: 1250, delta: 180, growth: 16.8 }, comps: ['Exness', 'CFI'] },
-    { id: 'SA', name: '沙特', coords: { top: '53%', left: '57%' }, tier: 2, aso: { val: 1200, delta: 100, growth: 9.1 }, geo: { val: 82, delta: 6, growth: 7.9 }, seo: { val: 950, delta: 85, growth: 9.8 }, comps: ['CFI', 'Exness'] },
-    { id: 'TR', name: '土耳其', coords: { top: '40%', left: '56%' }, tier: 2, aso: { val: 920, delta: 145, growth: 18.7 }, geo: { val: 68, delta: 12, growth: 21.4 }, seo: { val: 1150, delta: 210, growth: 22.3 }, comps: ['Exness', 'CFI'] },
-    { id: 'ZA', name: '南非', coords: { top: '78%', left: '52%' }, tier: 3, aso: { val: 450, delta: -20, growth: -4.2 }, geo: { val: 52, delta: -2, growth: -3.7 }, seo: { val: 380, delta: -15, growth: -3.8 }, comps: ['Capital.com', 'Exness'] },
-    { id: 'NG', name: '尼日利亚', coords: { top: '58%', left: '48%' }, tier: 3, aso: { val: 680, delta: 95, growth: 16.2 }, geo: { val: 45, delta: 8, growth: 21.6 }, seo: { val: 520, delta: 70, growth: 15.5 }, comps: ['Exness', 'PU Prime'] },
-    { id: 'BR', name: '巴西', coords: { top: '68%', left: '32%' }, tier: 1, aso: { val: 1250, delta: 110, growth: 9.6 }, geo: { val: 65, delta: 5, growth: 8.3 }, seo: { val: 580, delta: 62, growth: 12.0 }, comps: ['CFI', 'PU Prime'] },
-    { id: 'AR', name: '阿根廷', coords: { top: '82%', left: '29%' }, tier: 3, aso: { val: 320, delta: 45, growth: 16.4 }, geo: { val: 42, delta: 8, growth: 23.5 }, seo: { val: 210, delta: 30, growth: 16.7 }, comps: ['Exness', 'CFI'] },
-    { id: 'RU', name: '俄罗斯', coords: { top: '22%', left: '72%' }, tier: 1, aso: { val: 1650, delta: -180, growth: -9.8 }, geo: { val: 58, delta: -12, growth: -17.2 }, seo: { val: 1900, delta: -50, growth: -2.6 }, comps: ['Exness', 'CFI'] },
-    { id: 'AU', name: '澳大利亚', coords: { top: '78%', left: '86%' }, tier: 2, aso: { val: 820, delta: 8, growth: 0.9 }, geo: { val: 88, delta: 0, growth: 0.0 }, seo: { val: 950, delta: 35, growth: 3.8 }, comps: ['Plus500', 'Capital.com'] }
+    { id: 'AE', name: '阿联酋', coords: { top: '47%', left: '63%' }, tier: 2, aso: { val: 1550, delta: 245, growth: 18.8 }, geo: { val: 94, delta: 4, growth: 4.4 }, seo: { val: 1250, delta: 180, growth: 16.8 }, comps: ['Exness', 'CFI'] },
+    { id: 'SA', name: '沙特', coords: { top: '46%', left: '60%' }, tier: 2, aso: { val: 1200, delta: 100, growth: 9.1 }, geo: { val: 82, delta: 6, growth: 7.9 }, seo: { val: 950, delta: 85, growth: 9.8 }, comps: ['CFI', 'Exness'] },
+    { id: 'TR', name: '土耳其', coords: { top: '36%', left: '57%' }, tier: 2, aso: { val: 920, delta: 145, growth: 18.7 }, geo: { val: 68, delta: 12, growth: 21.4 }, seo: { val: 1150, delta: 210, growth: 22.3 }, comps: ['Exness', 'CFI'] },
+    { id: 'ZA', name: '南非', coords: { top: '75%', left: '54%' }, tier: 3, aso: { val: 450, delta: -20, growth: -4.2 }, geo: { val: 52, delta: -2, growth: -3.7 }, seo: { val: 380, delta: -15, growth: -3.8 }, comps: ['Capital.com', 'Exness'] },
+    { id: 'NG', name: '尼日利亚', coords: { top: '55%', left: '51%' }, tier: 3, aso: { val: 680, delta: 95, growth: 16.2 }, geo: { val: 45, delta: 8, growth: 21.6 }, seo: { val: 520, delta: 70, growth: 15.5 }, comps: ['Exness', 'PU Prime'] },
+    { id: 'BR', name: '巴西', coords: { top: '65%', left: '32%' }, tier: 1, aso: { val: 1250, delta: 110, growth: 9.6 }, geo: { val: 65, delta: 5, growth: 8.3 }, seo: { val: 580, delta: 62, growth: 12.0 }, comps: ['CFI', 'PU Prime'] },
+    { id: 'AR', name: '阿根廷', coords: { top: '80%', left: '30%' }, tier: 3, aso: { val: 320, delta: 45, growth: 16.4 }, geo: { val: 42, delta: 8, growth: 23.5 }, seo: { val: 210, delta: 30, growth: 16.7 }, comps: ['Exness', 'CFI'] },
+    { id: 'RU', name: '俄罗斯', coords: { top: '20%', left: '70%' }, tier: 1, aso: { val: 1650, delta: -180, growth: -9.8 }, geo: { val: 58, delta: -12, growth: -17.2 }, seo: { val: 1900, delta: -50, growth: -2.6 }, comps: ['Exness', 'CFI'] },
+    { id: 'AU', name: '澳大利亚', coords: { top: '75%', left: '88%' }, tier: 2, aso: { val: 820, delta: 8, growth: 0.9 }, geo: { val: 88, delta: 0, growth: 0.0 }, seo: { val: 950, delta: 35, growth: 3.8 }, comps: ['Plus500', 'Capital.com'] }
   ], []);
 
   // 3. 动态计算气泡样式
@@ -97,11 +97,10 @@ const MarketCommand = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-6 flex items-center justify-center font-sans text-slate-900 select-none">
-      <div className="w-[1100px] bg-white rounded-[40px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] border border-slate-200/60 flex flex-col relative overflow-hidden">
+    <div className="h-full bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden min-h-[500px]">
         
         {/* 顶部导航 */}
-        <div className="px-12 pt-10 pb-6 flex justify-between items-start z-10">
+        <div className="px-6 pt-6 pb-4 flex justify-between items-start z-10 flex-wrap gap-4">
           <div className="flex items-center gap-5">
             <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
               <Globe className="text-white" size={28} />
@@ -109,7 +108,7 @@ const MarketCommand = () => {
             <div>
               <h2 className="text-2xl font-black tracking-tight">全球市场曝光度</h2>
               <div className="flex items-center gap-2 mt-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Unified Market Intelligence</p>
               </div>
             </div>
@@ -129,7 +128,7 @@ const MarketCommand = () => {
         </div>
 
         {/* 1. 核心指标切换栏 (ASO/GEO/SEO) */}
-        <div className="px-12 flex gap-10 z-10 border-b border-slate-50">
+        <div className="px-6 flex gap-10 z-10 border-b border-slate-50">
           {['ASO', 'GEO', 'SEO'].map(tab => (
             <button
               key={tab}
@@ -142,9 +141,13 @@ const MarketCommand = () => {
         </div>
 
         {/* 地图区域 */}
-        <div className="relative h-[550px] w-full bg-white flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 px-10 py-6 opacity-[0.2] pointer-events-none transition-opacity duration-500">
-             <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg" alt="world map" className="w-full h-full object-contain grayscale" />
+        <div className="relative flex-1 min-h-[400px] w-full bg-white flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 px-10 py-6 opacity-[0.35] pointer-events-none transition-opacity duration-500 flex items-center justify-center">
+             <img 
+               src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" 
+               alt="world map" 
+               className="w-full h-full object-contain grayscale mix-blend-darken" 
+             />
           </div>
 
           {/* 地图上的数据气泡 */}
@@ -247,21 +250,21 @@ const MarketCommand = () => {
         </div>
 
         {/* 底部图例 */}
-        <div className="px-12 py-8 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center">
-          <div className="flex items-center gap-12">
+        <div className="px-6 py-6 bg-slate-50/50 border-t border-slate-100 flex flex-wrap gap-6 justify-between items-center">
+          <div className="flex flex-wrap items-center gap-6 xl:gap-12">
              <div className="space-y-2">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">热度映射刻度</span>
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] font-bold text-slate-400">Low / Decline</span>
-                  <div className="h-2 w-48 rounded-full bg-slate-200 overflow-hidden">
-                    <div className={`h-full transition-all duration-700 ${mode === 'Absolute' ? 'bg-emerald-500' : 'bg-gradient-to-r from-rose-500 via-slate-300 to-emerald-500'}`} style={{ width: '100%' }}></div>
+                  <div className="h-2 w-32 xl:w-48 rounded-full bg-slate-200 overflow-hidden">
+                    <div className={`h-full transition-all duration-700 ${mode === 'Absolute' ? 'bg-emerald-400' : 'bg-gradient-to-r from-rose-500 via-slate-300 to-emerald-400'}`} style={{ width: '100%' }}></div>
                   </div>
                   <span className="text-[10px] font-bold text-slate-800">High / Growth</span>
                 </div>
              </div>
              
-             <div className="flex items-center gap-4 border-l border-slate-200 pl-12">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
+             <div className="flex items-center gap-4 xl:border-l xl:border-slate-200 xl:pl-6">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100 shrink-0">
                   <Zap size={20} className="text-amber-500 fill-amber-500" />
                 </div>
                 <div>
@@ -270,13 +273,8 @@ const MarketCommand = () => {
                 </div>
              </div>
           </div>
-          
-          <button className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-[13px] font-bold hover:bg-slate-800 transition-all shadow-xl active:scale-95 flex items-center gap-2">
-             生成详细分析报告 <ArrowUpRight size={16} />
-          </button>
         </div>
 
-      </div>
     </div>
   );
 };

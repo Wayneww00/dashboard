@@ -128,7 +128,7 @@ const ChannelEfficiencyMatrix = () => {
                 <td className="p-4">
                   <div className="flex items-center gap-2" style={{ paddingLeft: `${(row.level - 1) * 24}px` }}>
                     {row.children ? (
-                      <button onClick={() => toggleRow(row.id)} className={`w-5 h-5 rounded flex items-center justify-center shadow-sm transition-all ${expandedRows.includes(row.id) ? 'bg-white text-slate-600 border border-slate-200' : 'bg-emerald-500 text-white shadow-emerald-500/20'}`}>
+                      <button onClick={() => toggleRow(row.id)} className={`w-5 h-5 rounded flex items-center justify-center shadow-sm transition-all ${expandedRows.includes(row.id) ? 'bg-white text-slate-600 border border-slate-200' : 'bg-emerald-400 text-white shadow-emerald-400/20'}`}>
                         {expandedRows.includes(row.id) ? <ChevronDown size={12} strokeWidth={3} /> : <ChevronRight size={12} strokeWidth={3} />}
                       </button>
                     ) : <div className="w-5 h-5 flex items-center justify-center opacity-20"><div className="w-1 h-1 rounded-full bg-slate-900" /></div>}
@@ -143,7 +143,7 @@ const ChannelEfficiencyMatrix = () => {
                 <td className="p-4 text-right font-bold text-xs tabular-nums transition-colors duration-500" style={getHeatmapStyle(row.ftt, 'cost', maxValues.ftt, row.level)}>${row.ftt.toFixed(1)}</td>
                 {/* LTV/CAC 列：数值越大，绿色越深 */}
                 <td className="p-4 text-right font-bold text-xs transition-colors duration-500" style={getHeatmapStyle(row.ltv, 'profit', maxValues.ltv, row.level)}>
-                  <span className={`${row.ltv > 5 ? 'text-emerald-600' : row.ltv > 3 ? 'text-slate-700' : 'text-rose-600'}`}>{row.ltv}x</span>
+                  <span className={`${row.ltv > 5 ? 'text-emerald-400' : row.ltv > 3 ? 'text-slate-700' : 'text-rose-600'}`}>{row.ltv}x</span>
                 </td>
               </tr>
             ))}
@@ -155,7 +155,7 @@ const ChannelEfficiencyMatrix = () => {
       <div className="px-6 py-4 flex justify-between items-center border-t border-slate-50 text-[10px] font-bold uppercase tracking-widest">
          <div className="flex gap-6 items-center">
            <div className="flex items-center gap-1.5">
-             <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500/30 border border-emerald-500/50"></div>
+             <div className="w-2.5 h-2.5 rounded-sm bg-emerald-400/30 border border-emerald-400/50"></div>
              <span className="text-slate-400">效率高 (High Efficiency)</span>
            </div>
            <div className="flex items-center gap-1.5">
@@ -163,22 +163,19 @@ const ChannelEfficiencyMatrix = () => {
              <span className="text-slate-400">成本高 (High Cost Alert)</span>
            </div>
          </div>
-         <button className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 group transition-colors">
-            查看完整获客漏斗归因分析 <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
-         </button>
       </div>
 
       {/* Insight Cards Section */}
       <div className="px-6 pb-6 pt-2 grid grid-cols-1 md:grid-cols-3 gap-4">
          
-         <div className="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100/50 flex flex-col justify-between h-full group hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+         <div className="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100/50 flex flex-col justify-between h-full group hover:shadow-lg hover:shadow-emerald-400/5 transition-all duration-300">
            <div>
-              <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[10px] mb-3">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] mb-3">
                 <TrendingUp size={14} /> BEST CHANNEL
               </div>
               <h3 className="text-base font-bold text-slate-900 tracking-tight mb-2">SEO (Organic) 稳居首位</h3>
               <p className="text-slate-500 text-xs leading-relaxed font-medium">
-                LTV/CAC 高达 <span className="text-emerald-600 font-bold">12.4x</span>，且获客成本仅为大盘均值的 20%。建议强化内容深度，沉淀长效私域流量。
+                LTV/CAC 高达 <span className="text-emerald-400 font-bold">12.4x</span>，且获客成本仅为大盘均值的 20%。建议强化内容深度，沉淀长效私域流量。
               </p>
            </div>
          </div>

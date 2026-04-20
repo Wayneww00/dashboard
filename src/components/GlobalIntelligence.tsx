@@ -31,7 +31,7 @@ import MarketExposureASO from './MarketExposureASO';
 const TrendBadge = ({ change }: { change: number }) => {
   const isPositive = change >= 0;
   return (
-    <div className={`flex items-center gap-0.5 text-[10px] font-bold ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}>
+    <div className={`flex items-center gap-0.5 text-[10px] font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-500'}`}>
       {isPositive ? <ArrowUpRight size={10} strokeWidth={3} /> : <ArrowDownRight size={10} strokeWidth={3} />}
       {Math.abs(change)}%
     </div>
@@ -83,7 +83,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="text-slate-300 text-[10px]">{entry.name}：</span>
               </div>
-              <span className="text-white font-bold text-[10px]">{entry.value}k</span>
+              <span className="text-white font-bold text-[10px]">{Number(entry.value).toFixed(1)}k</span>
             </div>
           ))}
         </div>
@@ -109,14 +109,7 @@ const GlobalIntelligence = () => {
         paidTraffic: { value: 12.5, change: -1.5 },
         paidKeywords: { value: 8.2, change: -3.4 }
       },
-      chart: [
-        { month: '1月', brand: 32, organic: 28, paid: 8 },
-        { month: '2月', brand: 35, organic: 29, paid: 9 },
-        { month: '3月', brand: 38, organic: 31, paid: 12 },
-        { month: '4月', brand: 36, organic: 30, paid: 11 },
-        { month: '5月', brand: 40, organic: 33, paid: 10 },
-        { month: '6月', brand: 42, organic: 35, paid: 12 },
-      ]
+      chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 30 + i, organic: 25 + i * 1.5, paid: 8 + Math.sin(i)*2 }))
     },
     'Asia': {
       kpis: {
@@ -126,13 +119,13 @@ const GlobalIntelligence = () => {
         paidTraffic: { value: 5.2, change: 1.2 },
         paidKeywords: { value: 2.1, change: -0.5 }
       },
-      chart: Array.from({ length: 6 }, (_, i) => ({ month: `${i + 1}月`, brand: 10 + i, organic: 8 + i, paid: 2 + i }))
+      chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 10 + i, organic: 8 + i, paid: 2 + i }))
     },
-    'Mena': { kpis: { authorityScore: { value: 75, change: 1, status: '稳定', percentile: '70%' }, organicTraffic: { value: 8.2, change: 4.1 }, organicKeywords: { value: 6.5, change: 3.2 }, paidTraffic: { value: 2.1, change: 0.5 }, paidKeywords: { value: 1.2, change: 0.2 } }, chart: Array.from({ length: 6 }, (_, i) => ({ month: `${i + 1}月`, brand: 5 + i, organic: 4 + i, paid: 1 })) },
-    'EU': { kpis: { authorityScore: { value: 85, change: -1, status: '良好', percentile: '82%' }, organicTraffic: { value: 22.1, change: -2.1 }, organicKeywords: { value: 18.5, change: 1.1 }, paidTraffic: { value: 4.5, change: -5.5 }, paidKeywords: { value: 3.2, change: -2.4 } }, chart: Array.from({ length: 6 }, (_, i) => ({ month: `${i + 1}月`, brand: 20 + i, organic: 18 + i, paid: 4 })) },
-    'Latam': { kpis: { authorityScore: { value: 70, change: 3, status: '上升', percentile: '65%' }, organicTraffic: { value: 5.4, change: 12.4 }, organicKeywords: { value: 4.1, change: 8.2 }, paidTraffic: { value: 1.2, change: 2.5 }, paidKeywords: { value: 0.8, change: 1.4 } }, chart: Array.from({ length: 6 }, (_, i) => ({ month: `${i + 1}月`, brand: 4 + i, organic: 3 + i, paid: 1 })) },
-    'Africa': { kpis: { authorityScore: { value: 62, change: 0.5, status: '潜力', percentile: '55%' }, organicTraffic: { value: 2.1, change: 1.2 }, organicKeywords: { value: 1.8, change: 0.9 }, paidTraffic: { value: 0.5, change: -0.2 }, paidKeywords: { value: 0.3, change: -0.1 } }, chart: Array.from({ length: 6 }, (_, i) => ({ month: `${i + 1}月`, brand: 2 + i, organic: 1 + i, paid: 0.5 })) },
-    'Others': { kpis: { authorityScore: { value: 55, change: 0.2, status: '平稳', percentile: '45%' }, organicTraffic: { value: 1.5, change: 0.5 }, organicKeywords: { value: 1.2, change: 0.3 }, paidTraffic: { value: 0.2, change: -0.1 }, paidKeywords: { value: 0.1, change: 0 } }, chart: Array.from({ length: 6 }, (_, i) => ({ month: `${i + 1}月`, brand: 1 + i, organic: 1 + i, paid: 0.2 })) },
+    'Mena': { kpis: { authorityScore: { value: 75, change: 1, status: '稳定', percentile: '70%' }, organicTraffic: { value: 8.2, change: 4.1 }, organicKeywords: { value: 6.5, change: 3.2 }, paidTraffic: { value: 2.1, change: 0.5 }, paidKeywords: { value: 1.2, change: 0.2 } }, chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 5 + i, organic: 4 + i, paid: 1 })) },
+    'EU': { kpis: { authorityScore: { value: 85, change: -1, status: '良好', percentile: '82%' }, organicTraffic: { value: 22.1, change: -2.1 }, organicKeywords: { value: 18.5, change: 1.1 }, paidTraffic: { value: 4.5, change: -5.5 }, paidKeywords: { value: 3.2, change: -2.4 } }, chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 20 + i, organic: 18 + i, paid: 4 })) },
+    'Latam': { kpis: { authorityScore: { value: 70, change: 3, status: '上升', percentile: '65%' }, organicTraffic: { value: 5.4, change: 12.4 }, organicKeywords: { value: 4.1, change: 8.2 }, paidTraffic: { value: 1.2, change: 2.5 }, paidKeywords: { value: 0.8, change: 1.4 } }, chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 4 + i, organic: 3 + i, paid: 1 })) },
+    'Africa': { kpis: { authorityScore: { value: 62, change: 0.5, status: '潜力', percentile: '55%' }, organicTraffic: { value: 2.1, change: 1.2 }, organicKeywords: { value: 1.8, change: 0.9 }, paidTraffic: { value: 0.5, change: -0.2 }, paidKeywords: { value: 0.3, change: -0.1 } }, chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 2 + i, organic: 1 + i, paid: 0.5 })) },
+    'Others': { kpis: { authorityScore: { value: 55, change: 0.2, status: '平稳', percentile: '45%' }, organicTraffic: { value: 1.5, change: 0.5 }, organicKeywords: { value: 1.2, change: 0.3 }, paidTraffic: { value: 0.2, change: -0.1 }, paidKeywords: { value: 0.1, change: 0 } }, chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 1 + i, organic: 1 + i, paid: 0.2 })) },
   };
 
   const currentSeoData = seoRegionData[region] || seoRegionData['Global'];
@@ -147,34 +140,34 @@ const GlobalIntelligence = () => {
 
   const visibilityTrendData = {
     'Vantage': [
-      { time: 'Jan 29', value: 95 }, { time: 'Jan 30', value: 85 }, { time: 'Jan 31', value: 92 },
-      { time: 'Feb 01', value: 78 }, { time: 'Feb 02', value: 82 }, { time: 'Feb 03', value: 88 },
-      { time: 'Feb 04', value: 91 }, { time: 'Feb 05', value: 78 }, { time: 'Feb 06', value: 82 },
-      { time: 'Feb 07', value: 88 }, { time: 'Feb 08', value: 92 },
+      { time: '1月', value: 95 }, { time: '2月', value: 85 }, { time: '3月', value: 92 },
+      { time: '4月', value: 78 }, { time: '5月', value: 82 }, { time: '6月', value: 88 },
+      { time: '7月', value: 91 }, { time: '8月', value: 78 }, { time: '9月', value: 82 },
+      { time: '10月', value: 88 }, { time: '11月', value: 92 }, { time: '12月', value: 95 },
     ],
     'Exness': [
-      { time: 'Jan 29', value: 80 }, { time: 'Jan 30', value: 82 }, { time: 'Jan 31', value: 85 },
-      { time: 'Feb 01', value: 88 }, { time: 'Feb 02', value: 85 }, { time: 'Feb 03', value: 89 },
-      { time: 'Feb 04', value: 87 }, { time: 'Feb 05', value: 88 }, { time: 'Feb 06', value: 89 },
-      { time: 'Feb 07', value: 88 }, { time: 'Feb 08', value: 89.8 },
+      { time: '1月', value: 80 }, { time: '2月', value: 82 }, { time: '3月', value: 85 },
+      { time: '4月', value: 88 }, { time: '5月', value: 85 }, { time: '6月', value: 89 },
+      { time: '7月', value: 87 }, { time: '8月', value: 88 }, { time: '9月', value: 89 },
+      { time: '10月', value: 88 }, { time: '11月', value: 89.8 }, { time: '12月', value: 89.5 },
     ],
     'XM': [
-      { time: 'Jan 29', value: 90 }, { time: 'Jan 30', value: 88 }, { time: 'Jan 31', value: 85 },
-      { time: 'Feb 01', value: 82 }, { time: 'Feb 02', value: 80 }, { time: 'Feb 03', value: 85 },
-      { time: 'Feb 04', value: 82 }, { time: 'Feb 05', value: 84 }, { time: 'Feb 06', value: 86 },
-      { time: 'Feb 07', value: 85 }, { time: 'Feb 08', value: 85.2 },
+      { time: '1月', value: 90 }, { time: '2月', value: 88 }, { time: '3月', value: 85 },
+      { time: '4月', value: 82 }, { time: '5月', value: 80 }, { time: '6月', value: 85 },
+      { time: '7月', value: 82 }, { time: '8月', value: 84 }, { time: '9月', value: 86 },
+      { time: '10月', value: 85 }, { time: '11月', value: 85.2 }, { time: '12月', value: 84 },
     ],
     'OctaFX': [
-      { time: 'Jan 29', value: 70 }, { time: 'Jan 30', value: 72 }, { time: 'Jan 31', value: 75 },
-      { time: 'Feb 01', value: 78 }, { time: 'Feb 02', value: 75 }, { time: 'Feb 03', value: 72 },
-      { time: 'Feb 04', value: 75 }, { time: 'Feb 05', value: 76 }, { time: 'Feb 06', value: 78 },
-      { time: 'Feb 07', value: 77 }, { time: 'Feb 08', value: 78 },
+      { time: '1月', value: 70 }, { time: '2月', value: 72 }, { time: '3月', value: 75 },
+      { time: '4月', value: 78 }, { time: '5月', value: 75 }, { time: '6月', value: 72 },
+      { time: '7月', value: 75 }, { time: '8月', value: 76 }, { time: '9月', value: 78 },
+      { time: '10月', value: 77 }, { time: '11月', value: 78 }, { time: '12月', value: 79 },
     ],
     'FBS': [
-      { time: 'Jan 29', value: 80 }, { time: 'Jan 30', value: 78 }, { time: 'Jan 31', value: 75 },
-      { time: 'Feb 01', value: 72 }, { time: 'Feb 02', value: 75 }, { time: 'Feb 03', value: 78 },
-      { time: 'Feb 04', value: 75 }, { time: 'Feb 05', value: 74 }, { time: 'Feb 06', value: 76 },
-      { time: 'Feb 07', value: 75 }, { time: 'Feb 08', value: 76.9 },
+      { time: '1月', value: 80 }, { time: '2月', value: 78 }, { time: '3月', value: 75 },
+      { time: '4月', value: 72 }, { time: '5月', value: 75 }, { time: '6月', value: 78 },
+      { time: '7月', value: 75 }, { time: '8月', value: 74 }, { time: '9月', value: 76 },
+      { time: '10月', value: 75 }, { time: '11月', value: 76.9 }, { time: '12月', value: 77 },
     ]
   };
 
@@ -198,7 +191,7 @@ const GlobalIntelligence = () => {
     { label: 'VISIBILITY', value: '88.4', trend: '+2.1', icon: Globe, color: 'text-indigo-500', bg: 'bg-indigo-50' },
     { label: 'PREVALENCE', value: '64.2', trend: '+1.5', icon: Target, color: 'text-violet-500', bg: 'bg-violet-50' },
     { label: 'MENTIONS', value: '2.8k', trend: '+412', icon: MessageSquare, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'SENTIMENT', value: '92%', trend: '+4%', icon: SmilePlus, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { label: 'SENTIMENT', value: '92%', trend: '+4%', icon: SmilePlus, color: 'text-emerald-400', bg: 'bg-emerald-50' },
   ];
 
 
@@ -224,7 +217,7 @@ const GlobalIntelligence = () => {
             <select 
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer hover:bg-slate-100"
+              className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
             >
               {regions.map(r => (
                 <option key={r} value={r}>{r}</option>
@@ -304,12 +297,12 @@ const GlobalIntelligence = () => {
               <div className="flex flex-col gap-2 mb-4">
                 <div className="space-y-0.5">
                   <h2 className="text-xs font-black text-slate-900 tracking-tight">流量趋势分析</h2>
-                  <p className="text-slate-400 text-[9px] font-medium">展示近六个月的多维度流量表现</p>
+                  <p className="text-slate-400 text-[9px] font-medium">展示近十二个月的多维度流量表现</p>
                 </div>
                 <div className="flex gap-3 flex-wrap">
                   {[
                     { label: '品牌流量', color: '#3b82f6' },
-                    { label: '自然流量', color: '#10b981' },
+                    { label: '自然流量', color: '#34d399' },
                     { label: '付费流量', color: '#f59e0b' }
                   ].map((dot, i) => (
                     <div key={i} className="flex items-center gap-1">
@@ -329,8 +322,8 @@ const GlobalIntelligence = () => {
                         <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorOrganic" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#34d399" stopOpacity={0.1}/>
+                        <stop offset="95%" stopColor="#34d399" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorPaid" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1}/>
@@ -342,7 +335,7 @@ const GlobalIntelligence = () => {
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }} tickFormatter={(val) => `${val}k`} />
                     <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1.5, strokeDasharray: '4 4' }} />
                     <Area type="monotone" dataKey="brand" name="品牌流量" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorBrand)" activeDot={{ r: 4, fill: '#3b82f6', strokeWidth: 0 }} />
-                    <Area type="monotone" dataKey="organic" name="自然流量" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorOrganic)" activeDot={{ r: 4, fill: '#10b981', strokeWidth: 0 }} />
+                    <Area type="monotone" dataKey="organic" name="自然流量" stroke="#34d399" strokeWidth={2} fillOpacity={1} fill="url(#colorOrganic)" activeDot={{ r: 4, fill: '#34d399', strokeWidth: 0 }} />
                     <Area type="monotone" dataKey="paid" name="付费流量" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#colorPaid)" activeDot={{ r: 4, fill: '#f59e0b', strokeWidth: 0 }} />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -379,7 +372,7 @@ const GlobalIntelligence = () => {
               </div>
               <div className="space-y-3">
                 {[
-                  { name: 'ChatGPT', icon: BrainCircuit, mentions: '489', cited: '2.3K', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+                  { name: 'ChatGPT', icon: BrainCircuit, mentions: '489', cited: '2.3K', color: 'text-emerald-400', bg: 'bg-emerald-50' },
                   { name: 'AI Overview', icon: Search, mentions: '1.1K', cited: '919', color: 'text-blue-500', bg: 'bg-blue-50' },
                   { name: 'AI Mode', icon: Sparkles, mentions: '724', cited: '1.6K', color: 'text-indigo-500', bg: 'bg-indigo-50' },
                   { name: 'Gemini', icon: Star, mentions: '1K', cited: '325', color: 'text-purple-500', bg: 'bg-purple-50' },
@@ -415,8 +408,8 @@ const GlobalIntelligence = () => {
                   <AreaChart data={currentTrendData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorVis" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={currentBrandData.changeType === 'up' ? '#10b981' : '#f43f5e'} stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor={currentBrandData.changeType === 'up' ? '#10b981' : '#f43f5e'} stopOpacity={0}/>
+                        <stop offset="5%" stopColor={currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e'} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e'} stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#374151" opacity={0.5} />
@@ -426,7 +419,7 @@ const GlobalIntelligence = () => {
                       tickLine={false} 
                       tick={{ fill: '#9ca3af', fontSize: 10 }} 
                       dy={10}
-                      minTickGap={20}
+                      interval="preserveStartEnd"
                     />
                     <YAxis 
                       axisLine={false} 
@@ -438,11 +431,11 @@ const GlobalIntelligence = () => {
                     />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem', color: '#f3f4f6', fontSize: '12px', fontWeight: 'bold' }}
-                      itemStyle={{ color: currentBrandData.changeType === 'up' ? '#10b981' : '#f43f5e' }}
+                      itemStyle={{ color: currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e' }}
                       formatter={(value: number) => [`${value}%`, 'Score']}
                       labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
                     />
-                    <Area type="monotone" dataKey="value" stroke={currentBrandData.changeType === 'up' ? '#10b981' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorVis)" />
+                    <Area type="monotone" dataKey="value" stroke={currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorVis)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -463,7 +456,7 @@ const GlobalIntelligence = () => {
                       <span className={`text-xs font-bold ${selectedBrand === brand.name ? 'text-gray-900' : 'text-gray-600'}`}>{brand.name}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`text-[10px] font-bold flex items-center gap-0.5 ${brand.changeType === 'up' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <span className={`text-[10px] font-bold flex items-center gap-0.5 ${brand.changeType === 'up' ? 'text-emerald-400' : 'text-rose-500'}`}>
                         {brand.changeType === 'up' ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
                         {brand.change.replace('+', '').replace('-', '')}
                       </span>

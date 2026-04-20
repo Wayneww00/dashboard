@@ -1,5 +1,5 @@
 import React from 'react';
-import { Info, Landmark, ArrowRight, Wallet, BarChart2 } from 'lucide-react';
+import { Info, Landmark, ArrowRight, Wallet, BarChart2, ArrowDown } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, LineChart, Line, ComposedChart, Scatter, ReferenceLine, CartesianGrid
@@ -57,11 +57,54 @@ const dataE = [
   { month: 'Nov', deposit: 12000, withdrawal: -6000 }, { month: 'Dec', deposit: 14000, withdrawal: -5500 },
 ].reverse();
 
-const dataF = Array.from({ length: 30 }, (_, i) => ({
-  day: `${i + 1}d`,
-  d7: Math.max(20, 80 * Math.pow(0.9, i) + Math.random() * 5),
-  d30: Math.max(5, 40 * Math.pow(0.95, i) + Math.random() * 3),
-}));
+const dataRetentionMonthly = [
+  { month: '1月', d7: 58.5, d30: 18.2, d7LastYear: 55.0, d30LastYear: 15.0 },
+  { month: '2月', d7: 59.2, d30: 18.5, d7LastYear: 56.0, d30LastYear: 15.5 },
+  { month: '3月', d7: 60.1, d30: 19.1, d7LastYear: 57.0, d30LastYear: 16.2 },
+  { month: '4月', d7: 61.2, d30: 19.4, d7LastYear: 58.2, d30LastYear: 17.0 },
+  { month: '5月', d7: 60.8, d30: 19.2, d7LastYear: 59.0, d30LastYear: 17.5 },
+  { month: '6月', d7: 61.5, d30: 19.8, d7LastYear: 60.0, d30LastYear: 18.0 },
+  { month: '7月', d7: 62.1, d30: 20.2, d7LastYear: 60.5, d30LastYear: 18.5 },
+  { month: '8月', d7: 62.5, d30: 20.5, d7LastYear: 61.0, d30LastYear: 19.0 },
+  { month: '9月', d7: 61.8, d30: 19.9, d7LastYear: 60.8, d30LastYear: 18.8 },
+  { month: '10月', d7: 62.3, d30: 20.3, d7LastYear: 61.2, d30LastYear: 19.2 },
+  { month: '11月', d7: 63.5, d30: 21.0, d7LastYear: 61.8, d30LastYear: 19.8 },
+  { month: '12月', d7: 64.2, d30: 21.5, d7LastYear: 62.0, d30LastYear: 20.0 },
+];
+
+const TooltipRetention = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-xs border border-gray-700 min-w-[140px]">
+        <div className="text-gray-400 mb-2 font-medium">2023年 {label}</div>
+        <div className="space-y-2">
+          <div>
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-blue-400 font-bold">D7 留存:</span>
+              <span className="font-bold">{data.d7}%</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px] text-gray-400">
+              <span>去年同期:</span>
+              <span>{data.d7LastYear}%</span>
+            </div>
+          </div>
+          <div className="pt-1 border-t border-gray-800">
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-orange-400 font-bold">D30 留存:</span>
+              <span className="font-bold">{data.d30}%</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px] text-gray-400">
+              <span>去年同期:</span>
+              <span>{data.d30LastYear}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 const dataConversion1 = [
   { month: '1月', current: 18.6, lastMonth: 18.0, lastYear: 17.5, target: 22.0 }, { month: '2月', current: 19.3, lastMonth: 18.6, lastYear: 18.0, target: 22.0 },
@@ -217,11 +260,11 @@ const CardValue = ({ value, mom, yoy }: any) => (
   <div className="mb-4">
     <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">{value}</div>
     <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-      <span className={`px-1.5 py-0.5 rounded ${mom.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
+      <span className={`px-1.5 py-0.5 rounded ${mom.startsWith('+') ? 'text-emerald-400 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
         MoM {mom}
       </span>
       <span className="text-gray-300">/</span>
-      <span className={`px-1.5 py-0.5 rounded ${yoy.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
+      <span className={`px-1.5 py-0.5 rounded ${yoy.startsWith('+') ? 'text-emerald-400 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
         YoY {yoy}
       </span>
     </div>
@@ -235,27 +278,27 @@ const NetDepositChart = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const monthData = [
-    { deposit: 4500, withdrawal: 2000 },
-    { deposit: 5200, withdrawal: 1800 },
-    { deposit: 4800, withdrawal: 3000 },
-    { deposit: 7000, withdrawal: 2500 },
-    { deposit: 8500, withdrawal: 4000 },
-    { deposit: 9500, withdrawal: 3500 },
-    { deposit: 10000, withdrawal: 5000 },
-    { deposit: 11500, withdrawal: 6000 },
-    { deposit: 13400, withdrawal: 4500 },
-    { deposit: 11000, withdrawal: 5500 },
-    { deposit: 11500, withdrawal: 4000 },
-    { deposit: 12500, withdrawal: 4800 },
+    { deposit: 4500, withdrawal: 2000, depositLastYear: 3800, withdrawalLastYear: 1800 },
+    { deposit: 5200, withdrawal: 1800, depositLastYear: 4500, withdrawalLastYear: 1500 },
+    { deposit: 4800, withdrawal: 3000, depositLastYear: 4200, withdrawalLastYear: 2800 },
+    { deposit: 7000, withdrawal: 2500, depositLastYear: 6000, withdrawalLastYear: 2200 },
+    { deposit: 8500, withdrawal: 4000, depositLastYear: 7500, withdrawalLastYear: 3500 },
+    { deposit: 9500, withdrawal: 3500, depositLastYear: 8000, withdrawalLastYear: 3200 },
+    { deposit: 10000, withdrawal: 5000, depositLastYear: 9000, withdrawalLastYear: 4800 },
+    { deposit: 11500, withdrawal: 6000, depositLastYear: 10000, withdrawalLastYear: 5500 },
+    { deposit: 13400, withdrawal: 4500, depositLastYear: 12000, withdrawalLastYear: 4200 },
+    { deposit: 11000, withdrawal: 5500, depositLastYear: 9500, withdrawalLastYear: 5800 },
+    { deposit: 11500, withdrawal: 4000, depositLastYear: 10500, withdrawalLastYear: 3800 },
+    { deposit: 12500, withdrawal: 4800, depositLastYear: 11000, withdrawalLastYear: 4500 },
   ];
 
-  const width = 400;
-  const height = 180;
+  const width = 320;
+  const height = 250;
   const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
-  const maxVal = Math.max(...monthData.map(d => Math.max(d.deposit, d.withdrawal))) * 1.2;
-  const chartWidth = 160; 
-  const barHeight = 10;
+  const maxVal = Math.max(...monthData.map(d => Math.max(d.deposit, d.withdrawal))) * 1.1;
+  const chartWidth = 120; 
+  const barHeight = 13;
   const gap = height / months.length;
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -268,7 +311,7 @@ const NetDepositChart = () => {
 
   return (
     <div 
-      className="relative flex-1 w-full min-h-[160px] flex items-center justify-center cursor-default mt-6 mb-2"
+      className="relative flex-1 w-full min-h-[220px] flex items-center justify-center cursor-default mt-6 mb-2"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setActiveIndex(null)}
       ref={containerRef}
@@ -276,8 +319,8 @@ const NetDepositChart = () => {
       <svg viewBox={`0 -25 ${width} ${height + 25}`} className="w-full h-full overflow-visible">
         <line x1={width / 2} y1={-15} x2={width / 2} y2={height} stroke="#e2e8f0" strokeWidth="1" />
         
-        <text x={width/2 - 30} y={-15} textAnchor="end" className="fill-gray-400 text-[10px] font-bold tracking-wider">WITHDRAWAL (出金)</text>
-        <text x={width/2 + 30} y={-15} textAnchor="start" className="fill-gray-400 text-[10px] font-bold tracking-wider">DEPOSIT (入金)</text>
+        <text x={width/2 - 25} y={-15} textAnchor="end" className="fill-gray-400 text-[10px] font-bold tracking-wider">WITHDRAWAL (出金)</text>
+        <text x={width/2 + 25} y={-15} textAnchor="start" className="fill-gray-400 text-[10px] font-bold tracking-wider">DEPOSIT (入金)</text>
 
         {monthData.map((d, i) => {
           const yPos = i * gap + gap/2;
@@ -296,19 +339,39 @@ const NetDepositChart = () => {
                 {months[i]}
               </text>
 
+              {/* Ghost Bar - Withdrawal (Last Year) */}
+              <rect 
+                x={width / 2 - 20 - ((d.withdrawalLastYear || 0) / maxVal) * chartWidth} 
+                y={yPos - barHeight / 2} 
+                width={((d.withdrawalLastYear || 0) / maxVal) * chartWidth} 
+                height={barHeight} 
+                rx={3} 
+                className="fill-slate-200 opacity-40 shadow-sm"
+              />
+
               <rect 
                 x={width / 2 - 20 - withWidth} 
                 y={yPos - barHeight / 2} 
-                width={withWidth} 
+                width={Math.max(2, withWidth)} 
                 height={barHeight} 
                 rx={3} 
                 className={`fill-rose-200 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-60'}`}
               />
 
+              {/* Ghost Bar - Deposit (Last Year) */}
               <rect 
                 x={width / 2 + 20} 
                 y={yPos - barHeight / 2} 
-                width={depWidth} 
+                width={((d.depositLastYear || 0) / maxVal) * chartWidth} 
+                height={barHeight} 
+                rx={3} 
+                className="fill-slate-200 opacity-40 shadow-sm"
+              />
+
+              <rect 
+                x={width / 2 + 20} 
+                y={yPos - barHeight / 2} 
+                width={Math.max(2, depWidth)} 
                 height={barHeight} 
                 rx={3} 
                 className={`fill-emerald-400 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-60'}`}
@@ -349,106 +412,74 @@ const NetDepositChart = () => {
 };
 
 const RetentionChart = () => {
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  const data7d = [100, 85, 75, 70, 68, 65, 62, 60, 59, 58];
-  const data30d = [100, 50, 40, 35, 30, 28, 25, 22, 21, 20];
-  const target7d = 60;
-  const target30d = 20;
-
-  const width = 400;
-  const height = 110;
-  const maxValue = 100;
-  const labels = ['1d', '2d', '3d', '4d', '5d', '6d', '7d', '14d', '21d', '30d'];
-  const gap = width / (labels.length - 1);
-
-  const getSmoothLinePath = (values: number[]) => {
-    return values.reduce((path, v, i) => {
-      const x = i * gap;
-      const y = height - (v / maxValue) * height;
-      if (i === 0) return `M ${x},${y}`;
-      const prevX = (i - 1) * gap;
-      const prevY = height - (values[i - 1] / maxValue) * height;
-      const cp1x = prevX + gap / 2;
-      const cp2x = x - gap / 2;
-      return `${path} C ${cp1x},${prevY} ${cp2x},${y} ${x},${y}`;
-    }, "");
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const index = Math.round(x / gap);
-    if (index >= 0 && index < labels.length) setActiveIndex(index);
-  };
-
   return (
-    <div 
-      className="relative flex-1 w-full mt-4 cursor-crosshair pr-6"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setActiveIndex(null)}
-      ref={containerRef}
-    >
-      <svg viewBox={`0 0 ${width} ${height + 20}`} className="w-full h-full overflow-visible">
-        {/* 基准线 - Target 7D */}
-        <line x1="0" y1={height - (target7d/maxValue)*height} x2={width} y2={height - (target7d/maxValue)*height} stroke="#3b82f6" strokeWidth="1" strokeDasharray="4 4" className="opacity-30" />
-        <text x={width + 5} y={height - (target7d/maxValue)*height + 3} className="fill-blue-400 text-[9px] font-bold">{target7d}%</text>
+    <div className="flex-1 w-full min-h-[140px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={dataRetentionMonthly} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
+          <defs>
+            <linearGradient id="colorD30" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#f97316" stopOpacity={0.1}/>
+              <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+          <XAxis 
+            dataKey="month" 
+            axisLine={false} 
+            tickLine={false} 
+            tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} 
+            dy={10} 
+          />
+          <YAxis hide domain={['dataMin - 5', 'auto']} />
+          <Tooltip 
+            content={<TooltipRetention />} 
+            cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} 
+          />
+          
+          {/* 去年同期 D7 - 灰色虚线 */}
+          <Line 
+            type="monotone" 
+            dataKey="d7LastYear" 
+            stroke="#cbd5e1" 
+            strokeWidth={1} 
+            strokeDasharray="4 4" 
+            dot={false}
+            activeDot={false} 
+          />
 
-        {/* 基准线 - Target 30D */}
-        <line x1="0" y1={height - (target30d/maxValue)*height} x2={width} y2={height - (target30d/maxValue)*height} stroke="#f97316" strokeWidth="1" strokeDasharray="4 4" className="opacity-30" />
-        <text x={width + 5} y={height - (target30d/maxValue)*height + 3} className="fill-orange-400 text-[9px] font-bold">{target30d}%</text>
+          {/* 去年同期 D30 - 灰色虚线 */}
+          <Line 
+            type="monotone" 
+            dataKey="d30LastYear" 
+            stroke="#cbd5e1" 
+            strokeWidth={1.5} 
+            strokeDasharray="4 4" 
+            dot={false}
+            activeDot={false} 
+          />
 
-        {/* 30D 面积与线条 */}
-        <path d={`${getSmoothLinePath(data30d)} L ${width},${height} L 0,${height} Z`} fill="#f97316" className="opacity-10" />
-        <path d={getSmoothLinePath(data30d)} fill="none" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" />
-
-        {/* 7D 面积与线条 */}
-        <path d={`${getSmoothLinePath(data7d)} L ${width},${height} L 0,${height} Z`} fill="#3b82f6" className="opacity-10" />
-        <path d={getSmoothLinePath(data7d)} fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
-
-        {/* X 轴标签 */}
-        {labels.map((l, i) => (
-          <text
-            key={i} x={i * gap} y={height + 16} textAnchor="middle"
-            className={`text-[9px] font-bold transition-colors ${
-              activeIndex === i ? 'fill-gray-900' : 'fill-gray-300'
-            }`}
-          >
-            {l}
-          </text>
-        ))}
-
-        {/* 交互指示线 */}
-        {activeIndex !== null && (
-          <line x1={activeIndex * gap} y1="0" x2={activeIndex * gap} y2={height} stroke="#9ca3af" strokeWidth="1" strokeDasharray="3 3" />
-        )}
-      </svg>
-
-      {/* 悬停浮层 Tooltip */}
-      {activeIndex !== null && (
-        <div 
-          className="absolute z-20 bg-gray-900 text-white p-3 rounded-xl shadow-xl pointer-events-none transition-all duration-75 border border-gray-700"
-          style={{ 
-            left: `${(activeIndex * gap / width) * 100}%`,
-            top: '0%',
-            transform: 'translateX(-50%)'
-          }}
-        >
-          <div className="text-[10px] font-black text-gray-400 mb-1.5 uppercase tracking-widest text-center">Day {labels[activeIndex]}</div>
-          <div className="space-y-1.5 min-w-[90px]">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-blue-400 font-bold">7D 线:</span>
-              <span className="font-black">{data7d[activeIndex]}%</span>
-            </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-orange-400 font-bold">30D 线:</span>
-              <span className="font-black">{data30d[activeIndex]}%</span>
-            </div>
-          </div>
-        </div>
-      )}
+          {/* D7 留存 - 蓝色细线 (领先指标) */}
+          <Line 
+            type="monotone" 
+            dataKey="d7" 
+            stroke="#3b82f6" 
+            strokeWidth={1.5} 
+            dot={{ r: 2, fill: '#3b82f6', strokeWidth: 1, stroke: '#fff' }} 
+            activeDot={{ r: 4 }} 
+          />
+          
+          {/* D30 留存 - 橙色实线面积图 (核心指标) */}
+          <Area 
+            type="monotone" 
+            dataKey="d30" 
+            stroke="#f97316" 
+            strokeWidth={2.5} 
+            fill="url(#colorD30)"
+            dot={{ r: 3.5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} 
+            activeDot={{ r: 5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} 
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
     </div>
   );
 };
@@ -536,27 +567,13 @@ export default function KPICards() {
 
       {/* 4. Net Deposit */}
       <CardWrapper>
-        <CardHeader title="Net Deposit (净入金)" />
+        <CardHeader title="Net Deposit (净入金)" tooltipText="月度净入金趋势" />
         <CardValue value="$1,542,060" mom="+9.4%" yoy="+23.3%" />
-        <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+        <div className="flex justify-between items-center px-1">
+          <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色阴影代表去年同期)</span>
         </div>
-        <div className="flex-1 w-full min-h-[140px] mt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataD} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorNetBar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
-              <Tooltip content={<TooltipD />} cursor={{ fill: '#f3f4f6' }} />
-              <Bar dataKey="current" fill="url(#colorNetBar)" barSize={12} radius={[4, 4, 0, 0]} />
-              <Line type="monotone" dataKey="previous" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={false} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+        
+        <NetDepositChart />
       </CardWrapper>
 
       {/* 5. 总交易量Trading Volume */}
@@ -574,43 +591,39 @@ export default function KPICards() {
         <div className="mb-4">
           <div className="text-3xl font-black text-[#1a1f2e] tracking-tighter mb-2">$15,420,600</div>
           <div className="flex items-center gap-3 text-[11px] font-bold">
-            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600">
+            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-400">
               MoM +12.5%
             </span>
             <span className="text-slate-300 font-normal">/</span>
-            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600">
+            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-400">
               YoY +25.6%
             </span>
           </div>
         </div>
+        
+        <div className="flex justify-between items-center mb-2 px-1">
+          <span className="text-[10px] text-gray-400 font-medium">近12个月趋势（灰色虚线为去年同期）</span>
+        </div>
 
-        <div className="flex-1 w-full min-h-[160px] mt-6">
+        <div className="flex-1 w-full min-h-[140px] mt-2">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={dataC} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
               <defs>
-                <linearGradient id="colorGhostBar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f8fafc" stopOpacity={1}/>
-                  <stop offset="95%" stopColor="#f8fafc" stopOpacity={0.4}/>
+                <linearGradient id="colorAreaVol" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.15}/>
+                  <stop offset="95%" stopColor="#94a3b8" stopOpacity={0.0}/>
                 </linearGradient>
               </defs>
               <XAxis 
                 dataKey="month" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 600 }} 
-                dy={15} 
+                tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} 
+                dy={10} 
               />
               <Tooltip 
                 content={<TooltipC />} 
-                cursor={{ fill: 'transparent' }} 
-              />
-              {/* 背景柱体 - Ghost Bars */}
-              <Bar 
-                dataKey="actual" 
-                fill="url(#colorGhostBar)" 
-                barSize={20} 
-                radius={[4, 4, 0, 0]} 
-                isAnimationActive={false}
+                cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} 
               />
               
               {/* 去年同期 - 灰色虚线 */}
@@ -625,11 +638,12 @@ export default function KPICards() {
               />
               
               {/* 主趋势线 - 深色平滑线 */}
-              <Line 
+              <Area 
                 type="natural" 
                 dataKey="actual" 
                 stroke="#1a1f2e" 
                 strokeWidth={3} 
+                fill="url(#colorAreaVol)"
                 dot={{ r: 4.5, fill: '#1a1f2e', strokeWidth: 2, stroke: '#fff' }} 
                 activeDot={{ r: 6, fill: '#1a1f2e', strokeWidth: 2, stroke: '#fff' }} 
               />
@@ -640,25 +654,53 @@ export default function KPICards() {
 
       {/* 6. 注册 -> FTD 转化率 */}
       <CardWrapper>
-        <CardHeader title="注册 → FTD 转化率" tooltipText="注册用户中完成首次入金的比例" />
-        <div className="flex justify-between items-start mb-2">
-          <div className="text-3xl font-bold text-gray-900 tracking-tight">24.0%</div>
-        </div>
-        <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-2">
-          <span className="px-1.5 py-0.5 rounded text-emerald-600 bg-emerald-50">MoM +2.4pp</span>
-          <span className="text-gray-300">/</span>
-          <span className="px-1.5 py-0.5 rounded text-emerald-600 bg-emerald-50">YoY +3.9pp</span>
-        </div>
-        <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <div className="flex items-center gap-1.5 text-gray-500 relative group cursor-pointer mb-2">
+              <span className="text-sm font-medium">注册 → FTD 转化率</span>
+              <Info className="w-3.5 h-3.5 opacity-50" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-[10px] rounded shadow-xl z-20 whitespace-normal">
+                注册用户中完成首次入金的比例
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">24.0%</div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">MoM +2.4%</span>
+              <span className="text-gray-300">/</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">YoY +3.9%</span>
+            </div>
+            <div className="flex items-center px-1">
+              <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+            </div>
+          </div>
+          
+          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100/50 flex flex-col items-center min-w-[100px]">
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+                <Landmark size={12} strokeWidth={2.5} />
+                <span className="text-[9px] font-black uppercase tracking-wider">注册人数</span>
+              </div>
+              <span className="text-sm font-black text-slate-800">12,480</span>
+            </div>
+            <div className="my-1.5 text-slate-300">
+               <ArrowDown size={12} className="text-slate-300" />
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1.5 text-emerald-400 mb-1">
+                <Wallet size={12} strokeWidth={2.5} />
+                <span className="text-[9px] font-black uppercase tracking-wider">FTD人数</span>
+              </div>
+              <span className="text-sm font-black text-slate-800">2,995</span>
+            </div>
+          </div>
         </div>
         <div className="flex-1 w-full min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={dataConversion1} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
               <defs>
                 <linearGradient id="colorConv1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.15}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#34d399" stopOpacity={0.15}/>
+                  <stop offset="95%" stopColor="#34d399" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -666,51 +708,54 @@ export default function KPICards() {
               <YAxis hide domain={[0, 'auto']} />
               <Tooltip content={<TooltipConversion />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
               <Area type="monotone" dataKey="current" stroke="none" fill="url(#colorConv1)" />
-              <Line type="monotone" dataKey="lastYear" stroke="#cbd5e1" strokeWidth={1.5} strokeDasharray="4 4" dot={{ r: 2, fill: '#fff', stroke: '#cbd5e1', strokeWidth: 1 }} activeDot={{ r: 4 }} />
-              <Line type="monotone" dataKey="current" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3.5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }} />
+              <Line type="monotone" dataKey="lastYear" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 1.5, fill: '#94a3b8', stroke: 'none' }} activeDot={{ r: 4 }} />
+              <Line type="monotone" dataKey="current" stroke="#34d399" strokeWidth={2.5} dot={{ r: 3.5, fill: '#34d399', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5, fill: '#34d399', strokeWidth: 2, stroke: '#fff' }} />
             </ComposedChart>
           </ResponsiveContainer>
-        </div>
-        <div className="mt-6 bg-slate-50/80 rounded-xl p-3.5 border border-slate-100/50 flex items-center justify-between">
-          <div className="flex flex-col items-center flex-1">
-            <div className="flex items-center gap-1.5 text-slate-400 mb-1.5">
-              <Landmark size={12} strokeWidth={2.5} />
-              <span className="text-[9px] font-black uppercase tracking-wider">注册人数</span>
-            </div>
-            <span className="text-sm font-black text-slate-800">12,480</span>
-          </div>
-          <div className="px-4">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100">
-               <ArrowRight size={14} className="text-slate-400" />
-            </div>
-          </div>
-          <div className="flex flex-col items-center flex-1">
-            <div className="flex items-center gap-1.5 text-emerald-600 mb-1.5">
-              <Wallet size={12} strokeWidth={2.5} />
-              <span className="text-[9px] font-black uppercase tracking-wider">FTD人数</span>
-            </div>
-            <span className="text-sm font-black text-slate-800">2,995</span>
-          </div>
-        </div>
-        <div className="flex justify-between text-[9px] font-bold text-slate-400 mt-2.5 px-2">
-          <span className="tracking-tight">vs. 上月 <span className="text-slate-500 font-black">21.6%</span></span>
-          <span className="tracking-tight">vs. 去年同期 <span className="text-slate-500 font-black">20.1%</span></span>
         </div>
       </CardWrapper>
 
       {/* 7. FTD -> FTT 转化率 */}
       <CardWrapper>
-        <CardHeader title="FTD → FTT 转化率" tooltipText="首次入金用户中完成首次交易的比例" />
-        <div className="flex justify-between items-start mb-2">
-          <div className="text-3xl font-bold text-gray-900 tracking-tight">50.0%</div>
-        </div>
-        <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-2">
-          <span className="px-1.5 py-0.5 rounded text-emerald-600 bg-emerald-50">MoM +1.8pp</span>
-          <span className="text-gray-300">/</span>
-          <span className="px-1.5 py-0.5 rounded text-emerald-600 bg-emerald-50">YoY +2.5pp</span>
-        </div>
-        <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <div className="flex items-center gap-1.5 text-gray-500 relative group cursor-pointer mb-2">
+              <span className="text-sm font-medium">FTD → FTT 转化率</span>
+              <Info className="w-3.5 h-3.5 opacity-50" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-[10px] rounded shadow-xl z-20 whitespace-normal">
+                首次入金用户中完成首次交易的比例
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">50.0%</div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-2">
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">MoM +1.8%</span>
+              <span className="text-gray-300">/</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">YoY +2.5%</span>
+            </div>
+            <div className="flex justify-between items-center px-1">
+              <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+            </div>
+          </div>
+          
+          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100/50 flex flex-col items-center min-w-[100px]">
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1.5 text-slate-400 mb-1">
+                <Wallet size={12} strokeWidth={2.5} />
+                <span className="text-[9px] font-black uppercase tracking-wider">FTD人数</span>
+              </div>
+              <span className="text-sm font-black text-slate-800">2,995</span>
+            </div>
+            <div className="my-1.5 text-slate-300">
+               <ArrowDown size={12} className="text-slate-300" />
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1.5 text-orange-500 mb-1">
+                <BarChart2 size={12} strokeWidth={2.5} />
+                <span className="text-[9px] font-black uppercase tracking-wider">FTT人数</span>
+              </div>
+              <span className="text-sm font-black text-slate-800">1,497</span>
+            </div>
+          </div>
         </div>
         <div className="flex-1 w-full min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -726,65 +771,30 @@ export default function KPICards() {
               <YAxis hide domain={[0, 'auto']} />
               <Tooltip content={<TooltipConversion />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
               <Area type="monotone" dataKey="current" stroke="none" fill="url(#colorConv2)" />
-              <Line type="monotone" dataKey="lastYear" stroke="#cbd5e1" strokeWidth={1.5} strokeDasharray="4 4" dot={{ r: 2, fill: '#fff', stroke: '#cbd5e1', strokeWidth: 1 }} activeDot={{ r: 4 }} />
+              <Line type="monotone" dataKey="lastYear" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 1.5, fill: '#94a3b8', stroke: 'none' }} activeDot={{ r: 4 }} />
               <Line type="monotone" dataKey="current" stroke="#f97316" strokeWidth={2.5} dot={{ r: 3.5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} />
             </ComposedChart>
           </ResponsiveContainer>
-        </div>
-        <div className="mt-6 bg-slate-50/80 rounded-xl p-3.5 border border-slate-100/50 flex items-center justify-between">
-          <div className="flex flex-col items-center flex-1">
-            <div className="flex items-center gap-1.5 text-slate-400 mb-1.5">
-              <Wallet size={12} strokeWidth={2.5} />
-              <span className="text-[9px] font-black uppercase tracking-wider">FTD人数</span>
-            </div>
-            <span className="text-sm font-black text-slate-800">2,995</span>
-          </div>
-          <div className="px-4">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-100">
-               <ArrowRight size={14} className="text-slate-400" />
-            </div>
-          </div>
-          <div className="flex flex-col items-center flex-1">
-            <div className="flex items-center gap-1.5 text-orange-500 mb-1.5">
-              <BarChart2 size={12} strokeWidth={2.5} />
-              <span className="text-[9px] font-black uppercase tracking-wider">FTT人数</span>
-            </div>
-            <span className="text-sm font-black text-slate-800">1,497</span>
-          </div>
-        </div>
-        <div className="flex justify-between text-[9px] font-bold text-slate-400 mt-2.5 px-2">
-          <span className="tracking-tight">vs. 上月 <span className="text-slate-500 font-black">48.2%</span></span>
-          <span className="tracking-tight">vs. 去年同期 <span className="text-slate-500 font-black">47.5%</span></span>
         </div>
       </CardWrapper>
 
       {/* 8. FTT后 D30 留存率 */}
       <CardWrapper>
-        <div className="flex justify-between items-start mb-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-slate-500 font-bold text-sm tracking-tight mb-2">
-              <span>FTT后 D30 留存率</span>
-              <Info size={14} className="opacity-40" />
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <div className="flex items-center gap-1.5 text-gray-500 relative group cursor-pointer mb-2">
+              <span className="text-sm font-medium">FTT后 D30 留存率</span>
+              <Info className="w-3.5 h-3.5 opacity-50" />
             </div>
-            <div className="text-3xl font-black text-slate-900 tracking-tighter transition-all">20.0%</div>
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 mt-3">
-              <span className="px-1.5 py-0.5 rounded-md text-emerald-600 bg-emerald-50">MoM +1.2pp</span>
-              <span className="text-slate-200">/</span>
-              <span className="px-1.5 py-0.5 rounded-md text-emerald-600 bg-emerald-50">YoY +2.0pp</span>
+            <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">20.0%</div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-2">
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">MoM +1.2%</span>
+              <span className="text-gray-300">/</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">YoY +2.0%</span>
             </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-4 text-[10px] font-black mb-3 border-b border-slate-50 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-            <span className="text-slate-400 uppercase tracking-wider">D7 留存率</span>
-            <span className="text-slate-900 font-black">62.0%</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></div>
-            <span className="text-slate-400 uppercase tracking-wider">D30 留存率</span>
-            <span className="text-orange-500 font-black">20.0%</span>
+            <div className="flex justify-between items-center px-1">
+              <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (橙色代表D30，蓝色代表D7，虚线代表去年同期)</span>
+            </div>
           </div>
         </div>
 

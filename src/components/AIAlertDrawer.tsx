@@ -43,7 +43,7 @@ const AIAlertDrawer: React.FC<AIAlertDrawerProps> = ({ isOpen, onClose }) => {
             <div>
               <h2 className="text-xl font-black text-gray-900 tracking-tight">AI 智能监控中心</h2>
               <div className="flex items-center gap-1.5 mt-1">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">3 Nodes Monitoring</span>
               </div>
             </div>

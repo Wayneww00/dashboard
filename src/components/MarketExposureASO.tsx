@@ -15,18 +15,18 @@ const kpiData = {
 
 // 模拟 12 个月的数据
 const yearlyRankingData = [
-  { month: '23/05', top1_3: 80, top4_10: 150, top10_50: 300, tail: 500 },
-  { month: '23/06', top1_3: 85, top4_10: 160, top10_50: 320, tail: 480 },
-  { month: '23/07', top1_3: 95, top4_10: 180, top10_50: 350, tail: 450 },
-  { month: '23/08', top1_3: 110, top4_10: 200, top10_50: 380, tail: 420 },
-  { month: '23/09', top1_3: 105, top4_10: 190, top10_50: 400, tail: 400 },
-  { month: '23/10', top1_3: 120, top4_10: 220, top10_50: 420, tail: 380 },
-  { month: '23/11', top1_3: 140, top4_10: 250, top10_50: 450, tail: 350 },
-  { month: '23/12', top1_3: 135, top4_10: 240, top10_50: 440, tail: 300 },
-  { month: '24/01', top1_3: 160, top4_10: 280, top10_50: 460, tail: 250 },
-  { month: '24/02', top1_3: 175, top4_10: 310, top10_50: 480, tail: 200 },
-  { month: '24/03', top1_3: 190, top4_10: 340, top10_50: 420, tail: 150 },
-  { month: '24/04', top1_3: 210, top4_10: 380, top10_50: 310, tail: 80 },
+  { month: '1月', top1_3: 80, top4_10: 150, top10_50: 300, tail: 500 },
+  { month: '2月', top1_3: 85, top4_10: 160, top10_50: 320, tail: 480 },
+  { month: '3月', top1_3: 95, top4_10: 180, top10_50: 350, tail: 450 },
+  { month: '4月', top1_3: 110, top4_10: 200, top10_50: 380, tail: 420 },
+  { month: '5月', top1_3: 105, top4_10: 190, top10_50: 400, tail: 400 },
+  { month: '6月', top1_3: 120, top4_10: 220, top10_50: 420, tail: 380 },
+  { month: '7月', top1_3: 140, top4_10: 250, top10_50: 450, tail: 350 },
+  { month: '8月', top1_3: 135, top4_10: 240, top10_50: 440, tail: 300 },
+  { month: '9月', top1_3: 160, top4_10: 280, top10_50: 460, tail: 250 },
+  { month: '10月', top1_3: 175, top4_10: 310, top10_50: 480, tail: 200 },
+  { month: '11月', top1_3: 190, top4_10: 340, top10_50: 420, tail: 150 },
+  { month: '12月', top1_3: 210, top4_10: 380, top10_50: 310, tail: 80 },
 ];
 
 const semanticCoreData = [
@@ -51,7 +51,7 @@ const semanticCoreData = [
 const COLORS = {
   top1_3: '#06b6d4',   // Cyan 500
   top4_10: '#3b82f6',  // Blue 500
-  top10_50: '#10b981', // Emerald 500
+  top10_50: '#34d399', // Emerald 500
   tail: '#94a3b8'      // Slate 400
 };
 
@@ -73,7 +73,7 @@ const FancyKPI = ({ label, value, change, isUp, icon: Icon, colorClass }: any) =
     </div>
     <div className="flex items-end justify-between">
       <span className="text-lg font-black text-slate-800 tracking-tight leading-none">{value}</span>
-      <div className={`flex items-center text-[9px] font-black px-1.5 py-0.5 rounded-full ${isUp ? 'text-emerald-500 bg-emerald-50' : 'text-rose-500 bg-rose-50'}`}>
+      <div className={`flex items-center text-[9px] font-black px-1.5 py-0.5 rounded-full ${isUp ? 'text-emerald-400 bg-emerald-50' : 'text-rose-500 bg-rose-50'}`}>
         {isUp ? '↑' : '↓'}{change}%
       </div>
     </div>
@@ -173,12 +173,36 @@ export default function MarketExposureASO() {
                     tick={{fontSize: 8, fill: '#94a3b8', fontWeight: 700}} 
                     axisLine={false}
                     tickLine={false}
-                    interval={2} 
+                    interval="preserveStartEnd" 
                   />
                   <YAxis axisLine={false} tickLine={false} tick={{fontSize: 8, fill: '#cbd5e1'}} />
                   <Tooltip 
-                    contentStyle={{backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'}}
-                    itemStyle={{fontSize: '10px', color: '#fff'}}
+                    content={({ active, payload, label }: any) => {
+                      if (active && payload && payload.length) {
+                        const order = ['Top 1-3', 'Top 4-10', 'Top 10-50', '50-250'];
+                        const sortedPayload = [...payload].sort((a, b) => {
+                          return order.indexOf(a.name) - order.indexOf(b.name);
+                        });
+                        return (
+                          <div className="bg-slate-900 rounded-xl p-4 shadow-xl z-50 min-w-[120px]">
+                            <p className="text-white text-xs font-bold mb-1">{label}</p>
+                            <p className="text-slate-400 text-[9px] font-bold mb-3 pb-2 border-b border-white/10 uppercase tracking-widest">关键词排名分布</p>
+                            <div className="flex flex-col gap-2">
+                              {sortedPayload.map((entry: any, index: number) => (
+                                <div key={index} className="flex justify-between items-center gap-4 text-[10px]">
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: entry.color }}></div>
+                                    <span style={{ color: entry.color }} className="font-bold">{entry.name}</span>
+                                  </div>
+                                  <span className="text-white font-black">{entry.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
                   />
                   <Area name="Top 1-3" type="monotone" dataKey="top1_3" stackId="1" stroke={COLORS.top1_3} strokeWidth={2} fill="url(#color1_3)" />
                   <Area name="Top 4-10" type="monotone" dataKey="top4_10" stackId="1" stroke={COLORS.top4_10} strokeWidth={1} fill="url(#color4_10)" />

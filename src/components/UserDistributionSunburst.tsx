@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Globe, Users, Lightbulb, Info, Megaphone, User, Leaf, Share2, ArrowRight, ChevronDown } from 'lucide-react';
+import { Layers, Globe, Users, Lightbulb, Info, Megaphone, User, Leaf, ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 
 const UserDistributionSunburst = () => {
   const [selectedRegion, setSelectedRegion] = useState('Global');
+  const [drilledBlock, setDrilledBlock] = useState<string | null>(null);
 
   // 地区列表
   const regions = ['Global', 'EU', 'Mena', 'Latam', 'Asia', 'Africa', 'Others'];
@@ -10,7 +11,7 @@ const UserDistributionSunburst = () => {
   // 根据地区动态生成数据逻辑
   const getRegionalData = (region: string) => {
     let scale = 1;
-    let total = 4050;
+    let total = 4050; // default for math
     let globalRatio = '100%';
 
     const r = region.toUpperCase();
@@ -49,6 +50,8 @@ const UserDistributionSunburst = () => {
     const organicPct = 0.16;
     const rafPct = 0.10; 
     
+    const paidAdsVal = Math.round(total * paidPct);
+
     return {
       total,
       globalRatio,
@@ -57,8 +60,15 @@ const UserDistributionSunburst = () => {
         val: retailVal,
         formatPct: '66%',
         children: [
+          { 
+            key: 'Paid Ads', label: '投放 Paid ads', val: paidAdsVal, pct: '22%', icon: Megaphone,
+            subChildren: [
+              { key: 'ASA', label: 'ASA', val: Math.round(paidAdsVal * 0.42), pct: '42%', isSub: true },
+              { key: 'Google Ads', label: 'Google Ads', val: Math.round(paidAdsVal * 0.38), pct: '38%', isSub: true },
+              { key: 'DSP', label: 'DSP', val: Math.round(paidAdsVal * 0.20), pct: '20%', isSub: true },
+            ]
+          },
           { key: 'KOL', label: 'KOL', val: Math.round(total * kolPct), pct: '18%', icon: User },
-          { key: 'Paid Ads', label: 'Paid Ads', val: Math.round(total * paidPct), pct: '22%', icon: Megaphone },
           { key: 'Organic', label: 'Organic', val: Math.round(total * organicPct), pct: '16%', icon: Leaf },
           { key: 'RAF', label: 'RAF', val: Math.round(total * rafPct), pct: '10%', icon: Users },
         ]
@@ -70,7 +80,18 @@ const UserDistributionSunburst = () => {
 
   useEffect(() => {
     setData(getRegionalData(selectedRegion));
+    setDrilledBlock(null); // Reset drill-down on region change
   }, [selectedRegion]);
+
+  const activeChildren = drilledBlock 
+    ? data.retail.children.find((c: any) => c.key === drilledBlock)?.subChildren || []
+    : data.retail.children;
+
+  const handleBlockClick = (key: string, hasArrow: boolean) => {
+    if (hasArrow) {
+      setDrilledBlock(key);
+    }
+  };
 
   return (
     <div className="h-full bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden">
@@ -91,7 +112,7 @@ const UserDistributionSunburst = () => {
           <select 
             value={selectedRegion}
             onChange={(e) => setSelectedRegion(e.target.value)}
-            className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer hover:bg-slate-100"
+            className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
           >
             {regions.map(r => (
               <option key={r} value={r}>{r}</option>
@@ -110,7 +131,7 @@ const UserDistributionSunburst = () => {
         <div className="grid grid-cols-2 gap-px bg-slate-200 border border-slate-200 rounded-2xl overflow-hidden shrink-0">
           <div className="bg-white p-5 flex flex-col items-center justify-center">
             <div className="flex items-center gap-2 mb-2">
-              <Users size={18} className="text-emerald-500" />
+              <Users size={18} className="text-emerald-400" />
               <span className="text-xs text-slate-500 font-bold tracking-tight">总新增用户</span>
             </div>
             <div className="flex items-baseline gap-1.5 mt-1">
@@ -120,7 +141,7 @@ const UserDistributionSunburst = () => {
           </div>
           <div className="bg-white p-5 flex flex-col items-center justify-center">
              <div className="flex items-center gap-2 mb-2">
-              <Globe size={18} className="text-emerald-500" />
+              <Globe size={18} className="text-emerald-400" />
               <span className="text-xs text-slate-500 font-bold tracking-tight">占全球新增比例</span>
             </div>
             <div className="text-3xl font-black text-slate-900 tracking-tighter">{data.globalRatio}</div>
@@ -128,115 +149,100 @@ const UserDistributionSunburst = () => {
         </div>
 
         {/* Matrix Visual Area */}
-        <div className="flex gap-4 h-[440px] shrink-0">
+        <div className="flex gap-[2px] rounded overflow-hidden mt-6 mb-4">
           
           {/* Left Column: Retail */}
-          <div className="flex-[1.8] flex flex-col bg-[#72926B] rounded-2xl overflow-hidden shadow-sm">
+          <div className="flex flex-col gap-[2px] min-w-0" style={{ flex: `${data.retail.val} 1 0%` }}>
             {/* Upper Main Stats */}
-            <div className="p-5 flex flex-col flex-1 relative">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-sm font-extrabold text-white tracking-tight">RETAIL（直营渠道）</span>
-                <span className="px-2 py-0.5 bg-white/10 rounded text-[9px] font-bold text-white uppercase tracking-widest ring-1 ring-white/20">占总新增 {data.retail.formatPct}</span>
+            <div className="bg-[#5a8c61] p-6 flex flex-col justify-center min-h-[160px]">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-base font-bold text-white tracking-wide">Retail</span>
               </div>
-              
-              <div className="flex flex-col mt-2">
-                <div className="text-4xl font-black text-white tracking-tighter leading-tight tabular-nums">{data.retail.formatPct}</div>
-                <div className="flex items-center gap-1.5 mt-2">
-                  <span className="text-base font-bold text-white tabular-nums">{data.retail.val.toLocaleString()}</span>
-                  <span className="text-[10px] font-bold text-white/50 uppercase tracking-wide">Users (New)</span>
-                </div>
-                <div className="text-[9px] font-bold text-white/40 mt-3 uppercase tracking-[0.15em]">Distribution: {data.retail.formatPct}</div>
-              </div>
+              <div className="text-base font-bold text-white mb-1">{data.retail.formatPct}</div>
+              <div className="text-base font-medium text-white/90">{data.retail.val.toLocaleString()}</div>
             </div>
 
             {/* Lower Breakdown Section */}
-            <div className="m-2 bg-[#E9F3ED] rounded-xl p-4 flex flex-col">
-              <div className="text-[9px] font-bold text-[#567652] mb-3 uppercase tracking-[0.12em] opacity-80">Retail Internal Breakdown (of Total New)</div>
-              <div className="grid grid-cols-4 gap-3">
-                {data.retail.children.map(child => {
-                  const Icon = child.icon;
-                  return (
-                    <div key={child.key} className="bg-white rounded-xl p-3 flex flex-col shadow-sm border border-[#D1E5DA]">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-6 h-6 rounded-full bg-[#F0F7F3] flex items-center justify-center">
-                          <Icon size={12} className="text-[#72926B]" />
+            <div className="flex gap-[2px] min-h-[160px] relative transition-all duration-500 ease-in-out">
+              {drilledBlock && (
+                <div 
+                  className="bg-[#7b9683] flex flex-col justify-center items-center cursor-pointer hover:bg-[#688270] transition-colors"
+                  style={{ width: '48px', flexShrink: 0 }}
+                  onClick={() => setDrilledBlock(null)}
+                  title="Back to Retail Breakdown"
+                >
+                  <ChevronLeft size={24} className="text-white" strokeWidth={2.5} />
+                </div>
+              )}
+              {activeChildren.map((child: any) => {
+                const hasArrow = !drilledBlock && child.key === 'Paid Ads';
+                return (
+                  <div 
+                    key={child.key} 
+                    className={`bg-[#b3ceb8] p-3 flex flex-col justify-center relative group transition-colors min-w-0 overflow-hidden ${hasArrow ? 'cursor-pointer hover:bg-[#a5c5ac]' : 'hover:bg-[#a5c5ac]'}`} 
+                    style={{ flex: `${child.val} 1 0%` }}
+                    onClick={() => handleBlockClick(child.key, hasArrow)}
+                  >
+                    <div className="flex justify-between items-center mb-1.5 gap-1">
+                      <div className="text-[13px] font-bold text-slate-800 tracking-wide leading-tight" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                        {child.label}
+                      </div>
+                      {hasArrow && (
+                        <div className="w-5 h-5 shrink-0 bg-white/50 rounded border border-white/50 flex items-center justify-center shadow-sm group-hover:bg-white group-hover:scale-105 transition-all">
+                          <ChevronRight size={12} className="text-slate-800" strokeWidth={3} />
                         </div>
-                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{child.label}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-base font-black text-slate-900 leading-none tabular-nums">{child.pct}</span>
-                        <span className="text-[9px] font-bold text-slate-400 mt-2 tabular-nums">{child.val.toLocaleString()} ppl</span>
-                        <div className="text-[7px] font-bold text-slate-300 mt-1 uppercase tracking-widest">Ratio {child.pct}</div>
-                      </div>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="flex flex-col">
+                      <div className="text-[13px] font-bold text-slate-800 mb-0.5 leading-none">{child.pct}</div>
+                      <div className="text-[13px] font-medium text-slate-800/90 leading-none">{child.val.toLocaleString()}</div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* Right Column: IB & Affiliate */}
-          <div className="flex-1 flex flex-col bg-[#232B3B] rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-5 flex flex-col flex-1 relative">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-sm font-extrabold text-white tracking-tight leading-tight max-w-[120px]">IB & AFFILIATE（经纪商联盟）</span>
-                <span className="px-2 py-0.5 bg-white/10 rounded text-[9px] font-bold text-white uppercase tracking-widest ring-1 ring-white/10">Share {data.ib.formatPct}</span>
-              </div>
-              
-              <div className="flex flex-col mt-2">
-                <div className="text-4xl font-black text-white tracking-tighter leading-tight tabular-nums">{data.ib.formatPct}</div>
-                <div className="flex items-center gap-1.5 mt-2">
-                  <span className="text-base font-bold text-white tabular-nums">{data.ib.val.toLocaleString()}</span>
-                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-wide">Users (New)</span>
-                </div>
-                <div className="text-[9px] font-bold text-white/30 mt-3 uppercase tracking-[0.15em]">Distribution: {data.ib.formatPct}</div>
-              </div>
-            </div>
-
-            {/* Placeholder Empty Section */}
-            <div className="m-2 min-h-[140px] border-2 border-dashed border-white/10 rounded-xl flex items-center justify-center p-6 text-center">
-              <div className="space-y-2">
-                <div className="flex justify-center"><Info size={16} className="text-white/20" /></div>
-                <p className="text-[10px] font-medium text-white/40 leading-relaxed">
-                  当前未展开子渠道拆分<br/>
-                  (如需查看，请前往渠道明细分析)
-                </p>
-              </div>
-            </div>
+          <div className="bg-[#222a35] p-6 flex flex-col justify-center relative group transition-colors hover:bg-[#2a3441] min-w-0" style={{ flex: `${data.ib.val} 1 0%` }}>
+             <div className="text-base font-bold text-white tracking-wide mb-2">IB & Affiliate</div>
+             <div className="flex flex-col">
+                <div className="text-base font-bold text-white mb-1">{data.ib.formatPct}</div>
+                <div className="text-base font-medium text-white/90">{data.ib.val.toLocaleString()}</div>
+             </div>
           </div>
         </div>
 
-        <div className="mt-auto bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/60 flex items-center gap-3 text-xs text-slate-700 font-bold shadow-sm">
-          <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-            <Lightbulb size={12} className="text-emerald-600" />
-          </div>
-          <span>结构洞察：Retail 渠道贡献 {data.retail.formatPct} 的新增，其中付费广告占比次之（{data.retail.children[1].pct}），KOL 驱动特征明显。</span>
+        <div className="bg-[#fafcfb] p-5 rounded-xl border border-[#e0ebe3] flex items-start gap-3 text-[13px] text-[#4f7b58] font-medium leading-relaxed transition-all duration-300">
+          <Lightbulb size={18} className="text-[#5a8c61] shrink-0 mt-0.5" />
+          {drilledBlock === 'Paid Ads' ? (
+            <span className="animate-in fade-in duration-500">
+              结构洞察：Paid Ads 共贡献 {data.retail.children.find((c: any) => c.key === 'Paid Ads')?.val.toLocaleString()} 名新增用户。其中 <strong>ASA</strong> 渠道表现最为强劲，转化占比达 42%（{(data.retail.children.find((c: any) => c.key === 'Paid Ads')?.val * 0.42).toLocaleString()}人），<strong>Google Ads</strong> 稳定输出占比 38%。
+            </span>
+          ) : (
+            <span className="animate-in fade-in duration-500">
+              结构洞察：Retail 贡献 {data.retail.formatPct} 的新增，其中付费广告占比最高（{data.retail.children.find((c: any) => c.key === 'Paid Ads')?.pct}），KOL 贡献 {data.retail.children.find((c: any) => c.key === 'KOL')?.pct}，自然流量 {data.retail.children.find((c: any) => c.key === 'Organic')?.pct}，IB & Affiliate 贡献 {data.ib.formatPct}。
+            </span>
+          )}
         </div>
 
       </div>
 
       {/* Footer */}
-      <footer className="px-6 py-4 bg-white border-t border-slate-100 flex justify-between items-center z-40 shrink-0">
-         <div className="flex gap-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            <div className="flex items-center gap-1.5 leading-none">
-              <div className="w-3 h-3 rounded-[3px] bg-[#72926B]"></div> 
-              <span className="mt-0.5">Retail (直营)</span>
-            </div>
-            <div className="flex items-center gap-1.5 leading-none">
-              <div className="w-3 h-3 rounded-[3px] bg-[#E9F3ED] border border-[#D1E5DA]"></div> 
-              <span className="mt-0.5">Retail Breakdown</span>
-            </div>
-            <div className="flex items-center gap-1.5 leading-none">
-              <div className="w-3 h-3 rounded-[3px] bg-[#232B3B]"></div> 
-              <span className="mt-0.5">IB & Affiliate</span>
-            </div>
-            <div className="flex items-center gap-1.5 ml-4 leading-none text-slate-400/80 normal-case tracking-normal">
-              <Info size={11} />
-              <span className="mt-0.5">Ratios are based on Total New Users</span>
-            </div>
+      <footer className="px-6 py-5 bg-white border-t border-slate-100 flex items-center gap-8 justify-start shrink-0">
+         <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+           <div className="w-4 h-4 rounded-sm bg-[#5a8c61]"></div> 
+           <span>Retail</span>
          </div>
-         <div className="text-slate-400 text-[10px] font-bold tabular-nums">
-            UPDATED: 2024-06-30
+         <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+           <div className="w-4 h-4 rounded-sm bg-[#222a35]"></div> 
+           <span>IB & Affiliate</span>
+         </div>
+         <div className="flex items-center gap-2 text-xs font-medium text-slate-500 ml-4">
+           <div className="w-5 h-5 rounded border border-slate-300 flex items-center justify-center bg-white shadow-sm">
+             <ChevronRight size={12} className="text-slate-500" strokeWidth={2} />
+           </div>
+           <span>表示存在下级渠道，可下钻查看详情</span>
          </div>
       </footer>
     </div>

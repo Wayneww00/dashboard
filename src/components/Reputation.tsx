@@ -41,7 +41,7 @@ const CustomScatterNode = (props: any) => {
   
   const fill = payload.sentiment === 'negative' ? '#cd5c5c' : '#71bc88';
   const glow = payload.sentiment === 'negative' ? 'rgba(205, 92, 92, 0.15)' : 'rgba(113, 188, 136, 0.15)';
-  const strokeColor = payload.sentiment === 'negative' ? '#e11d48' : '#10b981';
+  const strokeColor = payload.sentiment === 'negative' ? '#e11d48' : '#34d399';
   
   return (
     <g 
@@ -53,13 +53,6 @@ const CustomScatterNode = (props: any) => {
       <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fill="white" fontSize={11} fontWeight="bold">
         {payload.name}
       </text>
-      {/* High Priority Badge specifically for the most critical issue as in reference design */}
-      {payload.name === '客服回复慢' && (
-        <g transform={`translate(${cx - radius * 0.7 - 8}, ${cy - radius * 0.7 - 8})`}>
-          <circle cx={0} cy={0} r={9} fill="#0f172a" />
-          <text x={0} y={0} textAnchor="middle" dominantBaseline="central" fill="#f43f5e" fontSize={10} fontWeight="bold">1</text>
-        </g>
-      )}
     </g>
   );
 };
@@ -117,7 +110,7 @@ export default function Reputation() {
           <select 
             value={selectedRegion}
             onChange={(e) => setSelectedRegion(e.target.value)}
-            className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer hover:bg-slate-100"
+            className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
           >
             {regions.map(r => (
               <option key={r} value={r}>{r}</option>
@@ -130,91 +123,80 @@ export default function Reputation() {
       </div>
 
       {/* Chart Area */}
-      <div className="flex-1 min-h-[380px] w-full relative pt-4 pb-12 pl-[70px] pr-8 mt-2">
-        {/* Y Axis Custom Labels outside the chart container */}
-        <div className="absolute left-0 top-6 bottom-14 w-[60px] flex flex-col justify-between items-center text-center z-10 pointer-events-none">
-          <div className="text-[11px] font-bold text-gray-700 leading-tight">高影响<br/><span className="text-[10px] font-semibold text-gray-500">High</span></div>
-          <div className="text-xs font-bold text-gray-800 leading-tight">影响力<br/>传播影响<br/><span className="text-[9px] font-bold text-gray-500 tracking-wider">IMPACT</span></div>
-          <div className="text-[11px] font-bold text-gray-700 leading-tight">低影响<br/><span className="text-[10px] font-semibold text-gray-500">Low</span></div>
+      <div className="flex-1 min-h-[400px] w-full relative pt-6 pb-12 pl-[56px] pr-8 flex flex-col">
+        {/* Elegant Y-Axis Title */}
+        <div className="absolute left-[12px] top-[45%] -translate-y-1/2 -rotate-90 flex items-center gap-2 text-slate-400 origin-center pointer-events-none whitespace-nowrap">
+           <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Impact</span>
+           <span className="text-xs font-bold tracking-[0.2em] text-slate-600">传播影响力</span>
         </div>
 
-        {/* X Axis Custom Labels below the chart container */}
-        <div className="absolute left-[70px] right-[40px] bottom-1 h-[40px] flex items-end justify-between z-10 pointer-events-none">
-          <div className="text-rose-500 flex items-center gap-1.5 pb-1">
-             <span className="text-sm font-bold">←</span>
-             <div className="text-xs font-bold leading-tight">负向<br/><span className="text-[10px]">Negative</span></div>
-          </div>
-          
-          <div className="text-center absolute left-1/2 -translate-x-1/2 bottom-0 flex gap-4 items-center w-[80%]">
-             <div className="h-[1px] bg-gradient-to-l from-transparent to-rose-200 flex-1"></div>
-             <div className="flex flex-col items-center">
-               <div className="text-[11px] font-bold text-gray-800 leading-tight">中性<br/><span className="text-[10px] text-gray-500">Neutral</span></div>
-               <div className="text-[11px] font-bold text-gray-700 mt-1.5 tracking-widest whitespace-nowrap">情绪倾向 (SENTIMENT)</div>
-             </div>
-             <div className="h-[1px] bg-gradient-to-r from-transparent to-emerald-200 flex-1"></div>
-          </div>
-          
-          <div className="text-emerald-500 flex items-center gap-1.5 pb-1 text-right">
-             <div className="text-xs font-bold leading-tight">正向<br/><span className="text-[10px]">Positive</span></div>
-             <span className="text-sm font-bold">→</span>
-          </div>
-        </div>
+        {/* Boundary Ticks for Y-Axis (High/Low) to supplement chart ticks */}
+        <div className="absolute left-14 top-5 text-[9px] font-bold tracking-widest text-slate-400 uppercase pointer-events-none">High</div>
+        <div className="absolute left-14 bottom-14 text-[9px] font-bold tracking-widest text-slate-400 uppercase pointer-events-none">Low</div>
 
-        {/* Corner Indicator Badges */}
-        <div className="absolute top-10 left-24 z-20 bg-rose-50/90 border border-rose-100 rounded-lg py-2 px-4 text-center pointer-events-none shadow-sm backdrop-blur-sm">
-           <div className="text-xs font-bold text-rose-800 mb-0.5">高影响负面</div>
-           <div className="text-[10px] text-rose-500 font-medium">优先处理</div>
-        </div>
-        <div className="absolute bottom-20 left-24 z-20 bg-rose-50/90 border border-rose-100 rounded-lg py-2 px-4 text-center pointer-events-none shadow-sm backdrop-blur-sm">
-           <div className="text-xs font-bold text-rose-800 mb-0.5">低影响负面</div>
-           <div className="text-[10px] text-rose-500 font-medium">持续监控</div>
-        </div>
-        <div className="absolute top-10 right-16 z-20 bg-emerald-50/90 border border-emerald-100 rounded-lg py-2 px-4 text-center pointer-events-none shadow-sm backdrop-blur-sm">
-           <div className="text-xs font-bold text-emerald-800 mb-0.5">高影响正面</div>
-           <div className="text-[10px] text-emerald-500 font-medium">可放大传播</div>
-        </div>
-        <div className="absolute bottom-20 right-16 z-20 bg-emerald-50/90 border border-emerald-100 rounded-lg py-2 px-4 text-center pointer-events-none shadow-sm backdrop-blur-sm">
-           <div className="text-xs font-bold text-emerald-800 mb-0.5">低影响正面</div>
-           <div className="text-[10px] text-emerald-500 font-medium">一般亮点</div>
-        </div>
-
-        <ResponsiveContainer width="100%" height="100%" className="z-10 relative">
-          <ScatterChart margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
-            {/* Background quadrants */}
+        <ResponsiveContainer width="100%" height="100%" className="z-10 relative flex-1">
+          <ScatterChart margin={{ top: 16, right: 10, bottom: 0, left: 0 }}>
+            {/* Soft Background quadrants */}
             {/* @ts-ignore */}
-            <ReferenceArea x1={-100} x2={0} y1={0} y2={100} fill="#fef2f2" fillOpacity={0.6} />
+            <ReferenceArea x1={-100} x2={0} y1={0} y2={100} fill="#fef2f2" fillOpacity={0.4} />
             {/* @ts-ignore */}
-            <ReferenceArea x1={0} x2={100} y1={0} y2={100} fill="#f0fdf4" fillOpacity={0.6} />
+            <ReferenceArea x1={0} x2={100} y1={0} y2={100} fill="#f0fdf4" fillOpacity={0.4} />
             
-            {/* Center dividers */}
-            <ReferenceLine x={0} stroke="#cbd5e1" strokeDasharray="4 4" />
-            <ReferenceLine y={50} stroke="#cbd5e1" strokeDasharray="4 4" />
+            {/* Sophisticated Center Crosshairs */}
+            <ReferenceLine x={0} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3 4" />
+            <ReferenceLine y={50} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3 4" />
 
             <XAxis 
               type="number" 
               dataKey="x" 
               domain={[-100, 100]} 
               ticks={[-100, -50, 0, 50, 100]} 
-              axisLine={{ stroke: '#cbd5e1' }}
-              tickLine={{ stroke: '#cbd5e1' }}
-              tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }}
-              tickMargin={8}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }}
+              tickMargin={12}
             />
             <YAxis 
               type="number" 
               dataKey="y" 
               domain={[0, 100]} 
               ticks={[0, 25, 50, 75, 100]} 
-              axisLine={{ stroke: '#cbd5e1' }}
-              tickLine={{ stroke: '#cbd5e1' }}
-              tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }}
-              tickMargin={8}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }}
+              tickMargin={12}
             />
             <ZAxis type="number" dataKey="z" range={[100, 2000]} />
             <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#94a3b8' }} content={<CustomTooltip />} />
             <Scatter data={data} shape={<CustomScatterNode setActiveNode={setActiveNode} />} />
           </ScatterChart>
         </ResponsiveContainer>
+
+        {/* Sophisticated X-Axis Legend */}
+        <div className="absolute left-[80px] right-[40px] bottom-2 h-[24px] flex items-center justify-between z-10 pointer-events-none">
+          
+          <div className="flex items-center gap-1.5 opacity-90">
+             <span className="text-rose-400 font-bold text-sm">←</span>
+             <div className="flex items-baseline gap-1 text-rose-500">
+               <span className="text-xs font-bold tracking-widest">负面</span>
+               <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">Negative</span>
+             </div>
+          </div>
+          
+          <div className="flex items-center gap-2.5 opacity-90">
+             <span className="text-[11px] font-bold text-slate-700 tracking-widest">中性的 <span className="text-[10px] uppercase text-slate-400 ml-0.5 tracking-wider">Neutral</span></span>
+             <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sentiment</span>
+          </div>
+          
+          <div className="flex items-center gap-1.5 opacity-90">
+             <div className="flex items-baseline gap-1 text-emerald-400">
+               <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">Positive</span>
+               <span className="text-xs font-bold tracking-widest">正面</span>
+             </div>
+             <span className="text-emerald-400 font-bold text-sm">→</span>
+          </div>
+        </div>
       </div>
 
       {/* Dark Insight Card */}
@@ -224,7 +206,7 @@ export default function Reputation() {
           <div className={`w-8 h-8 rounded-full flex items-center justify-center border shrink-0 mt-1 ${
             activeNode.sentiment === 'negative' 
               ? 'bg-rose-500/20 border-rose-500/30' 
-              : 'bg-emerald-500/20 border-emerald-500/30'
+              : 'bg-emerald-400/20 border-emerald-400/30'
           }`}>
             {activeNode.sentiment === 'negative' ? (
               <AlertCircle className="w-4 h-4 text-rose-400" />
@@ -257,7 +239,7 @@ export default function Reputation() {
           <div className={`text-xs p-3 rounded-lg leading-relaxed border ${
             activeNode.sentiment === 'negative'
               ? 'text-rose-300 bg-rose-500/10 border-rose-500/20'
-              : 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20'
+              : 'text-emerald-300 bg-emerald-400/10 border-emerald-400/20'
           }`}>
             {activeNode.action}
           </div>
