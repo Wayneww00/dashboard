@@ -105,9 +105,10 @@ const GenericChartTooltip = ({ active, payload, label, valuePrefix = '', valueSu
     const currentVal = data.current ?? data.value ?? data.actual;
     const prevVal = data.lastMonth ?? data.previous;
     const yoyVal = data.lastYear;
+    const title = data.fullRange || label;
     return (
       <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-[11px] border border-gray-700 min-w-[140px]">
-        <div className="text-gray-400 mb-2 font-bold border-b border-gray-800 pb-1.5">{label}</div>
+        <div className="text-gray-400 mb-2 font-bold border-b border-gray-800 pb-1.5">{title}</div>
         <div className="flex justify-between mb-1">
           <span className="text-gray-300">当前:</span>
           <span className="font-bold text-emerald-400">{valuePrefix}{currentVal}{valueSuffix}</span>
@@ -133,9 +134,10 @@ const GenericChartTooltip = ({ active, payload, label, valuePrefix = '', valueSu
 const TooltipRetention = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const title = data.fullRange || label;
     return (
       <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-[11px] border border-gray-700 min-w-[140px]">
-        <div className="text-gray-400 mb-2 font-bold border-b border-gray-800 pb-1.5">{label}</div>
+        <div className="text-gray-400 mb-2 font-bold border-b border-gray-800 pb-1.5">{title}</div>
         <div className="space-y-2.5">
           <div>
             <div className="flex justify-between items-center mb-0.5">
@@ -260,24 +262,33 @@ const NetDepositChart = ({ scale, timeCtx }: { scale: number, timeCtx: any }) =>
 
     return rawMonthData.slice(-pointCount).map((d, index) => {
         let newLabel = '';
+        let fullRange = '';
         const offset = (pointCount - 1) - index; 
         if (timeCtx.granularity === 'daily') {
             const dt = new Date(timeCtx.end);
             dt.setDate(dt.getDate() - offset);
             newLabel = `${(dt.getMonth()+1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+            fullRange = `${dt.getFullYear()}.${(dt.getMonth()+1).toString().padStart(2, '0')}.${dt.getDate()}`;
         } else if (timeCtx.granularity === 'weekly') {
+            const weekEnd = new Date(timeCtx.end);
+            weekEnd.setDate(weekEnd.getDate() - (offset * 7));
+            const weekStart = new Date(weekEnd);
+            weekStart.setDate(weekStart.getDate() - 6);
             newLabel = `W${pointCount - offset}`; 
+            fullRange = `${newLabel} (${(weekStart.getMonth()+1).toString().padStart(2, '0')}.${weekStart.getDate()} - ${(weekEnd.getMonth()+1).toString().padStart(2, '0')}.${weekEnd.getDate()})`;
         } else {
             const dt = new Date(timeCtx.end);
             dt.setMonth(dt.getMonth() - offset);
             newLabel = `${dt.getMonth() + 1}月`;
+            fullRange = `${dt.getFullYear()}年 ${newLabel}`;
         }
         return {
           deposit: d.deposit * scale,
           withdrawal: d.withdrawal * scale,
           depositLastYear: d.depositLastYear * scale,
           withdrawalLastYear: d.withdrawalLastYear * scale,
-          label: newLabel
+          label: newLabel,
+          fullRange
         }
     });
   }, [scale, timeCtx]);
@@ -379,7 +390,7 @@ const NetDepositChart = ({ scale, timeCtx }: { scale: number, timeCtx: any }) =>
             transform: 'translateY(-50%)'
           }}
         >
-          <div className="text-[10px] font-black text-gray-400 mb-2 border-b border-gray-800 pb-1.5">{monthDataWithLabels[activeIndex].label}</div>
+          <div className="text-[10px] font-black text-gray-400 mb-2 border-b border-gray-800 pb-1.5">{monthDataWithLabels[activeIndex].fullRange || monthDataWithLabels[activeIndex].label}</div>
           <div className="space-y-1.5 min-w-[120px]">
             <div className="flex justify-between items-center text-xs">
               <span className="text-gray-300">入金:</span>
@@ -566,30 +577,38 @@ export default function KPICards() {
     // 动态计算该维度下应当显示的数据点数量
     let pointCount = baseData.length;
     if (timeCtx.granularity === 'daily') {
-      pointCount = Math.min(Math.max(timeCtx.diffDays, 7), 14); // 按日展现：最少7个点，最多14个点保持美观
+      pointCount = Math.min(Math.max(timeCtx.diffDays, 7), 14); 
     } else if (timeCtx.granularity === 'weekly') {
-      pointCount = Math.min(Math.max(Math.ceil(timeCtx.diffDays / 7), 4), 12); // 按周展现：4-12周
+      pointCount = Math.min(Math.max(Math.ceil(timeCtx.diffDays / 7), 4), 12);
     } else {
-      pointCount = 12; // 按月展现：固定展示滚动12个月趋势
+      pointCount = 12; 
     }
 
     // 截取数据并生成新的标签
     return baseData.slice(-pointCount).map((d, index) => {
         let newLabel = d.month;
+        let fullRange = '';
         const offset = (pointCount - 1) - index; 
         
         if (timeCtx.granularity === 'daily') {
             const dt = new Date(timeCtx.end);
             dt.setDate(dt.getDate() - offset);
             newLabel = `${(dt.getMonth()+1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+            fullRange = `${dt.getFullYear()}.${(dt.getMonth()+1).toString().padStart(2, '0')}.${dt.getDate().toString().padStart(2, '0')}`;
         } else if (timeCtx.granularity === 'weekly') {
+            const weekEnd = new Date(timeCtx.end);
+            weekEnd.setDate(weekEnd.getDate() - (offset * 7));
+            const weekStart = new Date(weekEnd);
+            weekStart.setDate(weekStart.getDate() - 6);
             newLabel = `W${pointCount - offset}`; 
+            fullRange = `${newLabel} (${(weekStart.getMonth()+1).toString().padStart(2, '0')}.${weekStart.getDate()} - ${(weekEnd.getMonth()+1).toString().padStart(2, '0')}.${weekEnd.getDate()})`;
         } else {
             const dt = new Date(timeCtx.end);
             dt.setMonth(dt.getMonth() - offset);
             newLabel = `${dt.getMonth() + 1}月`;
+            fullRange = `${dt.getFullYear()}年 ${newLabel}`;
         }
-        return { ...d, month: newLabel };
+        return { ...d, month: newLabel, fullRange };
     });
   }, [timeCtx]);
 
