@@ -85,8 +85,6 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export default function Reputation() {
   const [activeNode, setActiveNode] = useState(data[0]);
-  const [selectedRegion, setSelectedRegion] = useState('Global');
-  const regions = ['Global', 'EU', 'Mena', 'Latam', 'Asia', 'Africa', 'Others'];
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full flex flex-col">
@@ -102,22 +100,6 @@ export default function Reputation() {
               <Info className="w-4 h-4 text-gray-400" />
             </div>
             <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mt-0.5">Sentiment & AI Real-Time Monitor</p>
-          </div>
-        </div>
-
-        {/* 地区选择 Dropdown */}
-        <div className="relative group">
-          <select 
-            value={selectedRegion}
-            onChange={(e) => setSelectedRegion(e.target.value)}
-            className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
-          >
-            {regions.map(r => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-slate-600 transition-colors">
-            <ChevronDown size={14} />
           </div>
         </div>
       </div>

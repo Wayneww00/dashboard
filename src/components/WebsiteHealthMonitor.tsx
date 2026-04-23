@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, RefreshCw, Globe, ShieldCheck, ChevronRight, Zap, Smartphone, AlertCircle } from 'lucide-react';
+import { Sparkles, Globe, ShieldCheck, ChevronRight, Zap, Smartphone, Star, Info } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 
 const generateData = (base: number, variance: number) => {
@@ -10,11 +10,16 @@ const generateData = (base: number, variance: number) => {
 };
 
 const COUNTRIES = [
-  { id: 'US', flag: '🇺🇸', name: 'USA', city: 'Silicon Valley', lat: 113, top: '40%', left: '20%', jitter: '2ms', packetLoss: '0.001%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
-  { id: 'DE', flag: '🇩🇪', name: 'Germany', city: 'Frankfurt', lat: 245, top: '30%', left: '50%', jitter: '12ms', packetLoss: '0.05%', iosStatus: 'removed', androidStatus: 'normal', iosDesc: 'App Store 已下架', androidDesc: 'Google Play 正常访问' },
-  { id: 'CN', flag: '🇨🇳', name: 'China', city: 'Beijing', lat: 45, top: '35%', left: '75%', jitter: '1ms', packetLoss: '0.00%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: '各安卓市场正常访问' },
-  { id: 'IN', flag: '🇮🇳', name: 'India', city: 'Mumbai', lat: 180, top: '45%', left: '68%', jitter: '30ms', packetLoss: '5.2%', iosStatus: 'removed', androidStatus: 'removed', iosDesc: 'App Store 已被屏蔽', androidDesc: 'Google Play 已被屏蔽' },
-  { id: 'SG', flag: '🇸🇬', name: 'SG', city: 'Singapore', lat: 420, top: '60%', left: '78%', jitter: '25ms', packetLoss: '12.4%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'PK', flag: '🇵🇰', name: '巴基斯坦', city: '卡拉奇', lat: 3100, top: '45%', left: '68%', jitter: '12ms', packetLoss: '0.5%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'TH', flag: '🇹🇭', name: '泰国', city: '曼谷', lat: 3100, top: '55%', left: '77%', jitter: '15ms', packetLoss: '1.2%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'ID', flag: '🇮🇩', name: '印度尼西亚', city: '雅加达', lat: 1450, top: '65%', left: '80%', jitter: '5ms', packetLoss: '0.01%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'PH', flag: '🇵🇭', name: '菲律宾', city: '马尼拉', lat: 2600, top: '55%', left: '83%', jitter: '10ms', packetLoss: '0.05%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'VN', flag: '🇻🇳', name: '越南', city: '胡志明市', lat: 850, top: '52%', left: '79%', jitter: '2ms', packetLoss: '0.00%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: '各探测节点正常访问' },
+  { id: 'JP', flag: '🇯🇵', name: '日本', city: '东京', lat: 920, top: '35%', left: '85%', jitter: '1ms', packetLoss: '0.00%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'GB', flag: '🇬🇧', name: '英国', city: '伦敦', lat: 1100, top: '25%', left: '47%', jitter: '4ms', packetLoss: '0.001%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'AE', flag: '🇦🇪', name: '阿联酋', city: '迪拜', lat: 1550, top: '47%', left: '63%', jitter: '5ms', packetLoss: '0.05%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'AU', flag: '🇦🇺', name: '澳大利亚', city: '悉尼', lat: 1800, top: '80%', left: '85%', jitter: '8ms', packetLoss: '0.02%', iosStatus: 'normal', androidStatus: 'normal', iosDesc: 'App Store 正常访问', androidDesc: 'Google Play 正常访问' },
+  { id: 'CO', flag: '🇨🇴', name: '哥伦比亚', city: '波哥大', lat: 4500, top: '60%', left: '28%', jitter: '25ms', packetLoss: '12.4%', iosStatus: 'removed', androidStatus: 'normal', iosDesc: 'App Store 已下架', androidDesc: 'Google Play 正常访问' },
 ];
 
 const WebsiteHealthMonitor = () => {
@@ -28,10 +33,9 @@ const WebsiteHealthMonitor = () => {
 
   const getHealthStatus = (node: typeof COUNTRIES[0]) => {
     if (platform === 'app' && (node.iosStatus === 'removed' || node.androidStatus === 'removed')) return { color: 'rose', text: 'Critical', bg: 'bg-rose-500', textLight: 'text-rose-600' };
-    if (node.lat > 400) return { color: 'rose', text: 'Critical', bg: 'bg-rose-500', textLight: 'text-rose-600' };
-    if (node.lat < 150) return { color: 'emerald', text: 'Healthy', bg: 'bg-emerald-400', textLight: 'text-emerald-400' };
-    if (node.lat < 300) return { color: 'amber', text: 'Warning', bg: 'bg-amber-500', textLight: 'text-amber-600' };
-    return { color: 'rose', text: 'Critical', bg: 'bg-rose-500', textLight: 'text-rose-600' };
+    if (node.lat > 4000) return { color: 'rose', text: 'Critical', bg: 'bg-rose-500', textLight: 'text-rose-600' };
+    if (node.lat < 2500) return { color: 'emerald', text: 'Healthy', bg: 'bg-emerald-400', textLight: 'text-emerald-400' };
+    return { color: 'amber', text: 'Warning', bg: 'bg-amber-500', textLight: 'text-amber-600' };
   };
 
   const currentStatus = getHealthStatus(displayNode);
@@ -58,10 +62,17 @@ const WebsiteHealthMonitor = () => {
               <Globe className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h2 className="text-lg font-bold text-gray-900">官网/APP健康度监测</h2>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-100 shadow-sm" title="此板块为全局实时监测，不受历史时间轴影响">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mt-px">Live</span>
+                </div>
               </div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mt-0.5">Global Network Command</p>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mt-1">Global Network Command</p>
             </div>
           </div>
           <div className="flex bg-slate-100/80 p-1 rounded-xl">
@@ -108,10 +119,6 @@ const WebsiteHealthMonitor = () => {
 
           {/* Connecting Lines */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-            <line x1="20%" y1="40%" x2="50%" y2="30%" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="4 4" />
-            <line x1="50%" y1="30%" x2="75%" y2="35%" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="4 4" />
-            <line x1="75%" y1="35%" x2="78%" y2="60%" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="4 4" />
-            <line x1="20%" y1="40%" x2="78%" y2="60%" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
           </svg>
 
           {/* Nodes */}
@@ -123,184 +130,266 @@ const WebsiteHealthMonitor = () => {
             return (
               <div 
                 key={country.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-10"
-                style={{ top: country.top, left: country.left }}
+                className="absolute cursor-pointer group z-10 flex items-center gap-1.5"
+                style={{ top: country.top, left: country.left, transform: 'translate(-7px, -7px)' }}
                 onClick={() => setSelected(country)}
                 onMouseEnter={() => setHoveredCountry(country)}
                 onMouseLeave={() => setHoveredCountry(null)}
               >
-                {platform === 'web' && (
-                  <div className={`absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap transition-all ${isSelected ? 'bg-emerald-400 text-white opacity-100 shadow-md' : 'bg-white text-slate-500 shadow-sm opacity-0 group-hover:opacity-100'}`}>
-                    {country.lat}ms
-                  </div>
-                )}
-                {platform === 'app' && isSelected && !isAppRemoved && (
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap transition-all bg-emerald-400 text-white opacity-100 shadow-md">
+                {/* Dynamic Latency Label (Visible on web tab for yellow/red bubbles) */}
+                {platform === 'web' && country.lat >= 2500 && (
+                  <div className={`absolute bottom-[18px] left-[7px] -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-bold whitespace-nowrap shadow-sm text-white ${
+                    country.lat < 4000 ? 'bg-amber-500' : 'bg-rose-500'
+                  } ${isSelected ? 'scale-110 z-30' : 'opacity-90 group-hover:opacity-100 group-hover:z-30'}`}>
                     {country.lat}ms
                   </div>
                 )}
 
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-md transition-all ${isSelected ? 'bg-white ring-4 ring-emerald-100 scale-110' : 'bg-white/80 hover:bg-white hover:scale-110'}`}>
-                  {country.flag}
+                {/* Bubble Marker and Country Name */}
+                <div 
+                  className={`shrink-0 rounded-full border-2 border-white transition-all duration-300 ${isSelected ? 'scale-[1.4] ring-4 ring-white/50 z-30' : 'group-hover:scale-125 group-hover:z-30'}`}
+                  style={{ 
+                    width: 14, 
+                    height: 14, 
+                    backgroundColor: platform === 'web' 
+                      ? (country.lat < 2500 ? '#34d399' : country.lat < 4000 ? '#f59e0b' : '#f43f5e')
+                      : (isBothRemoved ? '#f43f5e' : isAppRemoved ? '#f59e0b' : '#34d399'),
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                  }}
+                />
+                <div className={`text-[10px] font-bold tracking-wide break-keep whitespace-nowrap transition-colors ${isSelected ? 'text-slate-900 drop-shadow-md' : 'text-slate-600 drop-shadow-sm group-hover:text-slate-800'}`}>
+                  {country.name}
                 </div>
-
-                {isAppRemoved ? (
-                  <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 ${isBothRemoved ? 'bg-rose-600' : 'bg-amber-500'} rounded-full border border-white flex items-center justify-center text-white shadow-md z-20`}>
-                    <span className="text-[10px] font-black leading-none">!</span>
-                  </div>
-                ) : (
-                  <>
-                    {isSelected && (
-                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping"></div>
-                    )}
-                    <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-rose-500' : 'bg-slate-300'}`}></div>
-                  </>
-                )}
               </div>
             );
           })}
 
           {/* App Tab Hover/Selected Map Overlay */}
+          
+          {/* Map Hover Tooltip */}
+          {hoveredCountry && (
+            <div className="absolute right-6 bottom-6 w-[230px] bg-slate-900 rounded-2xl p-4 shadow-xl border border-slate-700 z-50 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+               <div className="flex items-center gap-2 mb-3">
+                 <span className="text-xl leading-none">{hoveredCountry.flag}</span>
+                 <div className="flex-1">
+                   <h3 className="text-sm font-black text-white leading-tight">{hoveredCountry.name}</h3>
+                   <p className="text-[10px] text-slate-400 font-bold">{hoveredCountry.city}节点</p>
+                 </div>
+               </div>
+               
+               <div className="space-y-2">
+                 {platform === 'web' ? (
+                   <>
+                     <div className="flex justify-between items-center text-[10px] font-bold">
+                       <span className="text-slate-400">服务状态 (Status)</span>
+                       <span className="text-emerald-400 flex items-center gap-1">
+                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div> 正常 (Online)
+                       </span>
+                     </div>
+                     <div className="flex justify-between items-center text-[10px] font-bold">
+                       <span className="text-slate-400">加载速度 (Speed)</span>
+                       <span className={hoveredCountry.lat < 2500 ? 'text-emerald-400' : hoveredCountry.lat < 4000 ? 'text-amber-400' : 'text-rose-400'}>{hoveredCountry.lat}ms</span>
+                     </div>
+                     <div className="flex justify-between items-center text-[10px] font-bold">
+                       <span className="text-slate-400">SLA 评估</span>
+                       <span className={hoveredCountry.lat < 2500 ? 'text-emerald-400' : 'text-rose-400'}>
+                         {hoveredCountry.lat < 2500 ? '✅ 达标' : '❌ 未达标'}
+                       </span>
+                     </div>
+                   </>
+                 ) : (
+                   <>
+                     <div className="flex justify-between items-center text-[10px] font-bold">
+                       <span className="text-slate-400 flex items-center gap-1"><Smartphone size={10} /> App Store</span>
+                       <span className={hoveredCountry.iosStatus === 'normal' ? 'text-emerald-400' : 'text-rose-400'}>
+                         {hoveredCountry.iosStatus === 'normal' ? '正常' : '异常'}
+                       </span>
+                     </div>
+                     <div className="flex justify-between items-center text-[10px] font-bold mt-2">
+                       <span className="text-slate-400 flex items-center gap-1"><Smartphone size={10} /> Google Play</span>
+                       <span className={hoveredCountry.androidStatus === 'normal' ? 'text-emerald-400' : 'text-rose-400'}>
+                         {hoveredCountry.androidStatus === 'normal' ? '正常' : '异常'}
+                       </span>
+                     </div>
+                   </>
+                 )}
+               </div>
+            </div>
+          )}
+
+          {/* Legend Area */}
+          {platform === 'web' && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-6 px-6 py-2 bg-white/90 backdrop-blur-md rounded-full border border-slate-200 shadow-sm z-30">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                <span className="text-[10px] font-bold text-slate-500 whitespace-nowrap">良好 (LCP &lt; 2500ms)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                <span className="text-[10px] font-bold text-slate-500 whitespace-nowrap">需优化 (2500ms - 4000ms)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                <span className="text-[10px] font-bold text-slate-500 whitespace-nowrap">较差 (&gt; 4000ms)</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Dynamic Display Region based on Platform */}
         {platform === 'web' ? (
-          <div className={`border-[2px] ${displayNode.lat > 400 ? 'border-rose-400/80' : 'border-emerald-400/80'} rounded-2xl p-4 mb-4 shadow-sm bg-white flex justify-between items-center transition-all`}>
+          <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-slate-100 flex justify-between items-center transition-all">
             <div className="flex items-center gap-3">
               <div className="relative w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center shadow-sm">
                 <div className={`w-6 h-6 rounded-full ${currentStatus.bg}`}></div>
               </div>
               <div>
-                <h3 className="text-[14px] font-black tracking-tight text-slate-900 uppercase">{displayNode.city}</h3>
-                <p className="text-[10px] text-slate-400 font-bold italic uppercase tracking-wider">{displayNode.name} NODE</p>
+                <h3 className="text-[14px] font-black tracking-tight text-slate-900">{displayNode.city}</h3>
+                <p className="text-[10px] text-slate-400 font-bold tracking-wider">{displayNode.name}节点</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="flex gap-6">
+              <div className="flex gap-6 items-end">
                  <div>
-                  <div className="text-[10px] text-slate-400 font-bold mb-0.5">网站可用性</div>
-                  <div className="text-base font-black text-slate-900">99.99%</div>
+                  <div className="text-[10px] text-slate-400 font-bold mb-0.5">当前服务状态</div>
+                  <div className="text-sm font-black text-emerald-500 flex items-center gap-1.5 h-[24px]">
+                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                     正常 (Online)
+                  </div>
                  </div>
                  <div>
                   <div className="text-[10px] text-slate-400 font-bold mb-0.5">加载速度</div>
-                  <div className={`text-base font-black ${currentStatus.textLight}`}>{displayNode.lat * 10 + 20}ms</div>
+                  <div className={`text-base font-black leading-none h-[24px] flex items-center ${currentStatus.textLight}`}>{displayNode.lat}ms</div>
                  </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 mb-4">
-            {/* iOS Status */}
-            <div className={`border-[2px] ${displayNode.iosStatus === 'removed' ? 'border-rose-400/80' : 'border-emerald-400/80'} rounded-2xl p-4 shadow-sm bg-white flex justify-between items-center transition-all`}>
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-xl shadow-sm">
-                  
-                </div>
-                <div>
-                  <h3 className="text-[14px] font-black tracking-tight text-slate-900">{displayNode.name} App Store</h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{displayNode.iosDesc}</p>
-                </div>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {/* Google Play Card */}
+            <div className={`bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center relative transition-all group hover:shadow-md h-[160px]`}>
+              <div className={`w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-3 shadow-inner`}>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Google Play" className="w-8 h-8" referrerPolicy="no-referrer" />
               </div>
-              <div className="text-right">
-                <div className={`text-base font-black flex items-center justify-end gap-0.5 tracking-wide ${displayNode.iosStatus === 'removed' ? 'text-rose-500' : 'text-emerald-400'}`}>
-                  {displayNode.iosStatus === 'removed' ? '已下架' : '正常上架'}
-                  <ChevronRight size={18} />
-                </div>
+              <h3 className="text-sm font-bold text-slate-900 mb-2 font-sans tracking-tight">{displayNode.name} Google Play</h3>
+              <div className={`px-3 py-1 rounded-full text-[10px] font-bold ${displayNode.androidStatus === 'removed' ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-emerald-50 text-emerald-500 border border-emerald-100'}`}>
+                {displayNode.androidStatus === 'removed' ? '已下架' : '正常上架'}
               </div>
             </div>
 
-            {/* Android Status */}
-            <div className={`border-[2px] ${displayNode.androidStatus === 'removed' ? 'border-rose-400/80' : 'border-emerald-400/80'} rounded-2xl p-4 shadow-sm bg-white flex justify-between items-center transition-all`}>
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center text-lg shadow-sm">
-                  🤖
-                </div>
-                <div>
-                  <h3 className="text-[14px] font-black tracking-tight text-slate-900">{displayNode.name} Google Play</h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{displayNode.androidDesc}</p>
-                </div>
+            {/* Apple Store Card */}
+            <div className={`bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center relative transition-all group hover:shadow-md h-[160px]`}>
+              <div className={`w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-3 shadow-inner`}>
+                <Smartphone className="w-8 h-8 text-slate-900" />
               </div>
-              <div className="text-right">
-                <div className={`text-base font-black flex items-center justify-end gap-0.5 tracking-wide ${displayNode.androidStatus === 'removed' ? 'text-rose-500' : 'text-emerald-400'}`}>
-                  {displayNode.androidStatus === 'removed' ? '已下架' : '正常上架'}
-                  <ChevronRight size={18} />
-                </div>
+              <h3 className="text-sm font-bold text-slate-900 mb-2 font-sans tracking-tight">{displayNode.name} Apple Store</h3>
+              <div className={`px-3 py-1 rounded-full text-[10px] font-bold ${displayNode.iosStatus === 'removed' ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-emerald-50 text-emerald-500 border border-emerald-100'}`}>
+                {displayNode.iosStatus === 'removed' ? '已下架' : '正常上架'}
               </div>
             </div>
           </div>
         )}
 
         {platform === 'web' ? (
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                <ShieldCheck size={14} className="text-emerald-400" /> 可用性 (LCP&lt;2.5S)
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4 mb-4 mt-auto">
+            <div className="flex justify-between items-end">
+              <div>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 group relative cursor-help">
+                  <ShieldCheck size={14} className="text-emerald-400" /> 
+                  性能达标分布 (SLA)
+                  <Info size={12} className="text-slate-400/60" />
+                  
+                  {/* Tooltip Explanation */}
+                  <div className="absolute left-0 bottom-full mb-2 w-64 p-3 bg-slate-800 text-white text-[10px] font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-xl z-50 normal-case leading-relaxed">
+                    <div className="text-emerald-400 mb-1 font-bold">什么是 SLA？</div>
+                    该指标代表在全球探测节点中，加载延迟时间达标（即小于2500ms）的节点所占的比例。
+                  </div>
+                </div>
+                <div className="text-2xl font-black text-slate-900 leading-none">
+                  {Math.round((COUNTRIES.filter(c => c.lat < 2500).length / COUNTRIES.length) * 100)}%
+                  <span className="text-sm font-bold text-slate-400 ml-2 tracking-tight">全球地区达标</span>
+                </div>
               </div>
-              <div className="text-3xl font-black text-slate-900">99.98<span className="text-lg text-slate-500">%</span></div>
+              <div className="text-right">
+                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100 uppercase tracking-tighter">
+                  Service Level Agreement
+                </span>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 relative overflow-hidden">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 relative z-10">
-                <Zap size={14} className="text-emerald-400" /> 页面加载速度
-              </div>
-              <div className="text-3xl font-black text-emerald-400 relative z-10">{displayNode.lat * 10 + 20}<span className="text-lg text-emerald-300 italic ml-1">ms</span></div>
-              <div className="absolute bottom-0 left-0 w-full h-12 opacity-20">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trend}>
-                    <Area type="monotone" dataKey="value" stroke="#34d399" fill="#34d399" />
-                  </AreaChart>
-                </ResponsiveContainer>
+
+            {/* 堆叠进度条 */}
+            <div className="w-full h-3 bg-slate-50 rounded-full flex overflow-hidden border border-slate-100">
+               {/* 良好 */}
+               <div 
+                 className="h-full bg-emerald-400 transition-all duration-1000 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.05)]" 
+                 style={{ width: `${(COUNTRIES.filter(c => c.lat < 2500).length / COUNTRIES.length) * 100}%` }}
+               ></div>
+               {/* 需优化 */}
+               <div 
+                 className="h-full bg-amber-400 transition-all duration-1000 shadow-[inset_-2px_0_4px_rgba(0,0,0,0.05)]" 
+                 style={{ width: `${(COUNTRIES.filter(c => c.lat >= 2500 && c.lat <= 4000).length / COUNTRIES.length) * 100}%` }}
+               ></div>
+               {/* 较差 */}
+               <div 
+                 className="h-full bg-rose-500 transition-all duration-1000" 
+                 style={{ width: `${(COUNTRIES.filter(c => c.lat > 4000).length / COUNTRIES.length) * 100}%` }}
+               ></div>
+            </div>
+
+            <div className="flex justify-between items-center pt-1">
+              <p className="text-[11px] font-bold text-slate-400 italic">基于全球 {COUNTRIES.length} 个核心骨干节点探测</p>
+              <div className="flex gap-4">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Healthy</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Warning</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Critical</span>
+                </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="border-[2px] border-emerald-400/80 rounded-2xl p-5 mb-4 shadow-sm bg-white relative">
-            <div className="flex items-center gap-1.5 text-slate-900 mb-2">
-              <ShieldCheck size={16} className="text-emerald-400" />
-              <span className="text-[13px] font-bold tracking-wide">全平台状态汇总</span>
+          <div className="bg-white rounded-3xl p-6 mb-4 shadow-sm border-2 border-emerald-400/60 relative overflow-hidden">
+            {/* Header with Icon */}
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck size={18} className="text-emerald-500" />
+              <span className="text-sm font-bold text-slate-800 tracking-tight">全平台状态汇总</span>
             </div>
-            <div className="flex items-baseline gap-2 mb-1.5">
-              <span className="text-[40px] font-black text-slate-900 leading-none">3</span>
-              <span className="text-2xl font-bold text-slate-400 leading-none">/ 90</span>
+
+            {/* Main Stats */}
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-[52px] font-black text-slate-900 leading-none">3</span>
+              <span className="text-3xl font-bold text-slate-300 leading-none">/ 90</span>
             </div>
-            <div className="text-[10px] font-medium text-slate-500 mb-4 tracking-wider">异常点位 (iOS/安卓) / 总监控点位</div>
-            
-            <div className="h-[1px] w-full bg-slate-100 mb-3.5"></div>
-            
-            <div className="flex flex-col gap-2 relative z-10">
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
-                <span><span className="font-bold text-slate-700">Germany</span>: iOS App Store 已下架</span>
+            <p className="text-[11px] font-bold text-slate-400 mb-6 tracking-wide">异常点位 (iOS/安卓) / 总监控点位</p>
+
+            {/* Divider */}
+            <div className="h-[1px] w-full bg-slate-100 mb-6 font-bold"></div>
+
+            {/* Detailed Issues List */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-rose-500 shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></div>
+                <div className="text-[13px] font-bold text-slate-600">
+                  <span className="text-slate-900 font-black">Germany:</span> iOS App Store 已下架
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
-                <span><span className="font-bold text-slate-700">India</span>: iOS/安卓 市场均不可访问</span>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-rose-500 shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></div>
+                <div className="text-[13px] font-bold text-slate-600">
+                  <span className="text-slate-900 font-black">India:</span> iOS/安卓 市场均不可访问
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        <div className="bg-[#1a1f2e] rounded-2xl p-4 flex items-center gap-4 text-white mt-auto shadow-lg relative overflow-hidden">
-          <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
-            <Sparkles size={80} />
-          </div>
-
-          <div className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center shrink-0">
-            <Sparkles size={20} className="text-white" />
-          </div>
-          
-          <div className="flex-1 min-w-0 pr-4">
-            <div className="text-[10px] font-bold text-slate-400 mb-1">AI 总结</div>
-            <p className="text-xs font-bold text-slate-200 leading-snug">
-              {platform === 'web' 
-                ? `系统运行平稳，${displayNode.city} 节点加载速度 ${displayNode.lat * 10 + 20}ms，建议优化 Singapore 节点的边缘缓存策略。`
-                : `当前需重点关注: Germany, India，存在延迟异常波动或市场状态异常。`}
-            </p>
-          </div>
-
-          <button className="bg-slate-700/50 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold shrink-0 flex items-center gap-1 transition-colors border border-white/5">
-            完整分析 <ChevronRight size={14} />
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -1,28 +1,55 @@
 import React, { useState } from 'react';
-import { Target, Star, TrendingUp, TrendingDown, AlertCircle, ThumbsUp, ArrowUpRight, ArrowDownRight, Info, Calendar, ChevronDown, Trophy, Lightbulb, MessageSquare, Activity, List, ChevronUp, Clock, User } from 'lucide-react';
+import { Target, Star, TrendingUp, TrendingDown, AlertCircle, ThumbsUp, ArrowUpRight, ArrowDownRight, Info, Calendar, ChevronDown, Trophy, Lightbulb, MessageSquare, Activity, List, ChevronUp, Clock, User, X } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { useDashboardContext } from '../lib/DashboardContext';
 
 const AppMarketOverview = () => {
   const [platform, setPlatform] = useState('App Store');
-  const [region, setRegion] = useState('Global');
   const [trendTab, setTrendTab] = useState('评论量');
   const [selectedComp, setSelectedComp] = useState<string | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  
+  const { timeRange, selectedRegion } = useDashboardContext();
+
+  const timeScale = {
+    today: 0.03, yesterday: 0.035, thisWeek: 0.21, mtd: 1.0, lastMonth: 0.95, ytd: 4.8, last90: 2.9, custom: 1.2
+  }[timeRange] || 1.0;
+
+  const rScale: Record<string, number> = {
+    GLOBAL: 1.0, ASIA_VN: 0.15, EU_UK: 0.12, ASIA_IN: 0.2, MENA_AE: 0.08, GS_AU: 0.06,
+  };
+  const regionScale = rScale[selectedRegion] || 0.04;
+  const m = timeScale * regionScale;
 
   const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
-  const trendData = months.map((m, i) => {
+  const negativeReviews = [
+    { id: 1, text: "App crashes frequently. Very frustrating when trying to close a position.", date: "2024-06-28", rating: 1, tag: "稳定性" },
+    { id: 2, text: "Withdrawal has been pending for 3 days. Support is not answering.", date: "2024-06-26", rating: 1, tag: "出金" },
+    { id: 3, text: "Cannot login since yesterday. Kept saying wrong password but I just reset it.", date: "2024-06-25", rating: 2, tag: "登录" },
+    { id: 4, text: "Charts are lagging significantly during high volatility.", date: "2024-06-22", rating: 2, tag: "行情" },
+    { id: 5, text: "Customer service takes forever to reply. Disappointed.", date: "2024-06-20", rating: 1, tag: "服务" },
+    { id: 6, text: "Terrible execution speed. Slippage is insane compared to other brokers.", date: "2024-06-18", rating: 1, tag: "交易体验" },
+    { id: 7, text: "Verification process is a nightmare. Sent my documents 3 times already.", date: "2024-06-15", rating: 2, tag: "开户" },
+    { id: 8, text: "The new UI update is horrible. The old one was much easier to navigate.", date: "2024-06-14", rating: 2, tag: "易用性" },
+  ];
+
+  const trendData = months.map((mth, i) => {
     // Generate some mock data for 12 months for Vantage
-    const baseScore = 4.2 + (i * 0.05);
-    const baseDownloads = 100000 + (i * 12000);
-    const baseReviews = 10000 + (i * 1500);
+    // Score should lightly jitter but remain consistent across volumes
+    let baseScore = 4.2 + (i * 0.05);
+    if (baseScore > 5) baseScore = 5;
+    
+    const baseDownloads = Math.floor((100000 + (i * 12000)) * m);
+    const baseReviews = Math.floor((10000 + (i * 1500)) * m);
 
     // Mock data for a selected competitor if any
     const compScore = selectedComp ? baseScore - (Math.random() * 0.3) : undefined;
-    const compDownloads = selectedComp ? baseDownloads * (0.8 + Math.random() * 0.4) : undefined;
-    const compReviews = selectedComp ? baseReviews * (0.7 + Math.random() * 0.5) : undefined;
+    const compDownloads = selectedComp ? Math.floor(baseDownloads * (0.8 + Math.random() * 0.4)) : undefined;
+    const compReviews = selectedComp ? Math.floor(baseReviews * (0.7 + Math.random() * 0.5)) : undefined;
     
     return { 
-      name: m, 
+      name: mth, 
       score: Number(baseScore.toFixed(1)), 
       downloads: Math.round(baseDownloads), 
       reviews: Math.round(baseReviews), 
@@ -56,14 +83,14 @@ const AppMarketOverview = () => {
           <div>
             <h2 className="text-lg font-bold text-gray-900 tracking-tight">应用市场口碑摘要</h2>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[10px] font-medium text-gray-500">核心口碑表现与竞品对比 (近30天)</span>
+              <span className="text-[10px] font-medium text-gray-500">核心口碑表现与竞品对比</span>
             </div>
           </div>
         </div>
 
         <div className="flex gap-3 items-center">
           <div className="flex bg-gray-50 p-1 rounded-lg border border-gray-200">
-            {['App Store', 'Google Play'].map(p => (
+            {['App Store', 'Google Play', 'Trustpilot'].map(p => (
               <button 
                 key={p} 
                 onClick={() => setPlatform(p)} 
@@ -72,28 +99,6 @@ const AppMarketOverview = () => {
                 {p}
               </button>
             ))}
-          </div>
-          
-          {/* 地区选择 Dropdown */}
-          <div className="relative group">
-            <select 
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
-            >
-              {['Global', 'EU', 'Mena', 'Latam', 'Asia', 'Africa', 'Others'].map(r => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-slate-600 transition-colors">
-              <ChevronDown size={14} />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-2 rounded-lg text-xs font-bold text-gray-600 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
-            <Calendar size={14} className="text-gray-400" />
-            <span>2024-01-01 ~ 2024-06-30</span>
-            <ChevronDown size={14} className="text-gray-400" />
           </div>
         </div>
       </div>
@@ -141,7 +146,7 @@ const AppMarketOverview = () => {
             <div className="grid grid-cols-3 gap-0 mb-6 divide-x divide-gray-100">
               <div className="pr-2">
                 <div className="text-[11px] text-gray-500 font-medium mb-2">评论总量</div>
-                <div className="text-xl font-bold text-slate-800 mb-2">23.5k</div>
+                <div className="text-xl font-bold text-slate-800 mb-2">{Math.round((23.5 * m) * 10) / 10}k</div>
                 <div className="flex items-center gap-1 text-emerald-500 text-[11px] font-bold mb-1">
                   <ArrowUpRight size={12} /><span>12%</span>
                 </div>
@@ -152,7 +157,7 @@ const AppMarketOverview = () => {
                 <div className="text-[11px] text-gray-500 font-medium mb-2">5星占比</div>
                 <div className="text-xl font-bold text-slate-800 mb-2">71%</div>
                 <div className="flex items-center gap-1 text-emerald-500 text-[11px] font-bold mb-1">
-                  <ArrowUpRight size={12} /><span>3pct</span>
+                  <ArrowUpRight size={12} /><span>3%</span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-medium">较上月</div>
               </div>
@@ -161,7 +166,7 @@ const AppMarketOverview = () => {
                 <div className="text-[11px] text-gray-500 font-medium mb-2">好评率 (4-5星)</div>
                 <div className="text-xl font-bold text-slate-800 mb-2">89%</div>
                 <div className="flex items-center gap-1 text-emerald-500 text-[11px] font-bold mb-1">
-                  <ArrowUpRight size={12} /><span>2pct</span>
+                  <ArrowUpRight size={12} /><span>2%</span>
                 </div>
                 <div className="text-[10px] text-gray-400 font-medium">较上月</div>
               </div>
@@ -178,7 +183,7 @@ const AppMarketOverview = () => {
           </div>
 
           {/* Card 2: 评论主题洞察 */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col relative overflow-hidden">
             <div className="text-sm font-bold text-gray-900 mb-6">评论主题洞察 <span className="text-xs text-gray-400 font-normal">(近30天)</span></div>
             
             <div className="grid grid-cols-2 gap-8 mb-6">
@@ -196,7 +201,7 @@ const AppMarketOverview = () => {
                         <span className="text-gray-700 font-medium">{item.name}</span>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-gray-900">{item.pct}%</span>
-                          <span className="text-[9px] text-emerald-400 font-bold flex items-center"><ArrowUpRight size={10}/>{item.change}ppt</span>
+                          <span className="text-[9px] text-emerald-400 font-bold flex items-center"><ArrowUpRight size={10}/>{item.change}%</span>
                         </div>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -220,7 +225,7 @@ const AppMarketOverview = () => {
                         <span className="text-gray-700 font-medium">{item.name}</span>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-gray-900">{item.pct}%</span>
-                          <span className="text-[9px] text-rose-500 font-bold flex items-center"><ArrowUpRight size={10}/>{item.change}ppt</span>
+                          <span className="text-[9px] text-rose-500 font-bold flex items-center"><ArrowUpRight size={10}/>{item.change}%</span>
                         </div>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -240,20 +245,17 @@ const AppMarketOverview = () => {
                   <span className="text-[13px] font-bold text-slate-800">代表性差评原声</span>
                   <span className="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-500 border border-rose-100 rounded-md font-bold">REVIEWS</span>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
-                  <ChevronDown size={12}/> 滑动查看更多
-                </div>
+                <button 
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-full transition-colors cursor-pointer group"
+                >
+                  点击展开更多 <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
               </div>
 
               <div className="bg-rose-50/20 border border-rose-100/40 rounded-2xl overflow-hidden">
                 <div className="h-[100px] overflow-y-auto snap-y snap-mandatory scrollbar-hide p-2 space-y-2">
-                  {[
-                    { id: 1, text: "App crashes frequently. Very frustrating when trying to close a position.", date: "2024-06-28", rating: 1, tag: "稳定性" },
-                    { id: 2, text: "Withdrawal has been pending for 3 days. Support is not answering.", date: "2024-06-26", rating: 1, tag: "出金" },
-                    { id: 3, text: "Cannot login since yesterday. Kept saying wrong password but I just reset it.", date: "2024-06-25", rating: 2, tag: "登录" },
-                    { id: 4, text: "Charts are lagging significantly during high volatility.", date: "2024-06-22", rating: 2, tag: "行情" },
-                    { id: 5, text: "Customer service takes forever to reply. Disappointed.", date: "2024-06-20", rating: 1, tag: "服务" },
-                  ].map(review => (
+                  {negativeReviews.slice(0, 5).map(review => (
                     <div key={review.id} className="snap-start bg-white border border-rose-100/50 rounded-xl p-3 shadow-sm hover:border-rose-300 transition-colors">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1">
@@ -287,16 +289,74 @@ const AppMarketOverview = () => {
                 </div>
               </div>
             </div>
+            {/* Review Overlay (Localized Modal) */}
+            {isReviewModalOpen && (
+              <div className="absolute inset-0 z-50 bg-white flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-200">
+                {/* Overlay Header */}
+                <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100 bg-white relative z-10">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 shrink-0 border border-rose-100/50">
+                      <AlertCircle size={14} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 leading-none mb-1">全部代表性差评原声</h3>
+                      <p className="text-[10px] text-gray-400 font-medium leading-none">Representative Negative Reviews</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsReviewModalOpen(false)}
+                    className="w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors shrink-0 group"
+                  >
+                    <X size={14} className="group-hover:scale-110 transition-transform" />
+                  </button>
+                </div>
+                
+                {/* Overlay Content */}
+                <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-slate-50/50">
+                  {negativeReviews.map(review => (
+                    <div key={review.id} className="bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm rounded-xl p-4 transition-all">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex-1">
+                          <p className="text-xs text-gray-800 leading-relaxed font-medium">
+                            "{review.text}"
+                          </p>
+                        </div>
+                        <div className="shrink-0 flex flex-col items-end gap-1.5">
+                          <div className="flex gap-0.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star key={i} size={10} className={i < review.rating ? "fill-amber-400 text-amber-400" : "fill-slate-100 text-slate-200"} />
+                            ))}
+                          </div>
+                          <span className="text-[9px] px-1.5 py-0.5 bg-rose-50 text-rose-500 font-bold border border-rose-100/50 rounded">{review.tag}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-slate-50 pt-2.5">
+                        <div className="flex items-center gap-1.5 line-clamp-1">
+                          <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
+                            <User size={10} className="text-slate-400" />
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-medium">匿名用户</span>
+                          <span className="text-slate-200 mx-0.5">|</span>
+                          <span className="text-[10px] text-slate-500 font-medium">{platform}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 shrink-0">
+                          <Clock size={10} />
+                          {review.date}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Detailed Analysis Section (Always Expanded) */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-6 bg-slate-50/30">
-              <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
-                
-                {/* Trend Chart */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6">
+          
+          {/* Trend Chart */}
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
                   <div className="flex justify-between items-start mb-6">
                     <div>
                       <span className="text-sm font-bold text-gray-900">{trendTab}趋势</span>
@@ -344,7 +404,7 @@ const AppMarketOverview = () => {
 
                   <div className="flex-1 min-h-[180px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={trendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+                      <AreaChart data={trendData} margin={{ top: 20, right: 10, left: -5, bottom: 0 }}>
                         <defs>
                           <linearGradient id="colorGreen" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#34d399" stopOpacity={0.2}/>
@@ -352,7 +412,18 @@ const AppMarketOverview = () => {
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <YAxis hide domain={['auto', 'auto']} />
+                        <YAxis 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }} 
+                          domain={['auto', 'auto']}
+                          tickFormatter={(val) => {
+                            if (trendTab === '评分') return val.toFixed(1);
+                            if (val >= 1000000) return (val / 1000000).toFixed(1) + 'm';
+                            if (val >= 1000) return (val / 1000).toFixed(0) + 'k';
+                            return val;
+                          }}
+                        />
                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8', fontWeight: 'bold' }} dy={10} />
                         <Tooltip 
                           cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5 }} 
@@ -425,11 +496,14 @@ const AppMarketOverview = () => {
 
                 {/* Theme Insights */}
                 <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-6 h-6 bg-emerald-50 rounded flex items-center justify-center">
-                      <List size={14} className="text-emerald-400" />
+                  <div className="flex flex-col mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-emerald-50 rounded flex items-center justify-center">
+                        <List size={14} className="text-emerald-400" />
+                      </div>
+                      <span className="text-sm font-bold text-gray-900">竞品对比</span>
                     </div>
-                    <span className="text-sm font-bold text-gray-900">竞品对比</span>
+                    <span className="text-[10px] text-gray-400 mt-1 ml-8">点击下方竞品可将数据添加至左侧趋势图进行多维对比分析</span>
                   </div>
                   
                   <div className="flex-1">
@@ -480,10 +554,8 @@ const AppMarketOverview = () => {
                 </div>
 
               </div>
-            </div>
         </div>
       </div>
-    </div>
   );
 };
 

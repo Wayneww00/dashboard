@@ -1,42 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, Globe, Users, Lightbulb, Info, Megaphone, User, Leaf, ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
+import { useDashboardContext } from '../lib/DashboardContext';
 
 const UserDistributionSunburst = () => {
-  const [selectedRegion, setSelectedRegion] = useState('Global');
+  const [localRegion, setLocalRegion] = useState('Global');
   const [drilledBlock, setDrilledBlock] = useState<string | null>(null);
+  const { timeRange, selectedRegion } = useDashboardContext();
 
   // 地区列表
   const regions = ['Global', 'EU', 'Mena', 'Latam', 'Asia', 'Africa', 'Others'];
 
   // 根据地区动态生成数据逻辑
   const getRegionalData = (region: string) => {
-    let scale = 1;
-    let total = 4050; // default for math
-    let globalRatio = '100%';
+    // Dynamic time range multiplier
+    const timeScale = {
+      today: 0.03, yesterday: 0.035, thisWeek: 0.21, mtd: 1.0, lastMonth: 0.95, ytd: 4.8, last90: 2.9, custom: 1.2
+    }[timeRange] || 1.0;
 
-    const r = region.toUpperCase();
-    if (r === 'GLOBAL') {
-      total = 11250;
-      globalRatio = '100%';
-    } else if (r === 'ASIA') {
-      total = Math.round(4050 * 1.4);
-      globalRatio = '45%';
-    } else if (r === 'EU') {
-      total = 4050;
-      globalRatio = '36%';
-    } else if (r === 'MENA') {
-      total = 1215;
-      globalRatio = '12%';
-    } else if (r === 'LATAM') {
-      total = 810;
-      globalRatio = '8%';
-    } else if (r === 'AFRICA') {
-      total = 520;
-      globalRatio = '5%';
-    } else {
-      total = 405;
-      globalRatio = '4%';
-    }
+    const rScale: Record<string, number> = {
+      GLOBAL: 1.0, ASIA_VN: 0.15, EU_UK: 0.12, ASIA_IN: 0.2, MENA_AE: 0.08, GS_AU: 0.06,
+    };
+    const globalRegionScale = rScale[selectedRegion] || 0.04;
+
+    const m = timeScale * globalRegionScale;
+
+    // Fix double-scaling bug: base users is 11250 globally.
+    const total = Math.round(11250 * m); 
+    const globalRatio = Math.round(globalRegionScale * 100) + '%';
     
     // 基础比例
     const retailPct = 0.66;
@@ -104,22 +94,6 @@ const UserDistributionSunburst = () => {
           <div>
             <h1 className="text-lg font-bold tracking-tight leading-none text-slate-900">新增用户来源构成矩阵</h1>
             <p className="text-slate-400 text-[9px] font-bold uppercase tracking-[0.2em] mt-1">Multi-Tier Growth Attribution</p>
-          </div>
-        </div>
-
-        {/* 地区选择 Dropdown */}
-        <div className="relative group">
-          <select 
-            value={selectedRegion}
-            onChange={(e) => setSelectedRegion(e.target.value)}
-            className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
-          >
-            {regions.map(r => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-slate-600 transition-colors">
-            <ChevronDown size={14} />
           </div>
         </div>
       </header>
@@ -217,11 +191,11 @@ const UserDistributionSunburst = () => {
           <Lightbulb size={18} className="text-[#5a8c61] shrink-0 mt-0.5" />
           {drilledBlock === 'Paid Ads' ? (
             <span className="animate-in fade-in duration-500">
-              结构洞察：Paid Ads 共贡献 {data.retail.children.find((c: any) => c.key === 'Paid Ads')?.val.toLocaleString()} 名新增用户。其中 <strong>ASA</strong> 渠道表现最为强劲，转化占比达 42%（{(data.retail.children.find((c: any) => c.key === 'Paid Ads')?.val * 0.42).toLocaleString()}人），<strong>Google Ads</strong> 稳定输出占比 38%。
+              结构洞察：Paid Ads 共贡献 {Math.floor(data.retail.children.find((c: any) => c.key === 'Paid Ads')?.val || 0).toLocaleString()} 名新增用户。其中 <strong>ASA</strong> 渠道表现最为强劲，转化占比达 42%（{Math.floor((data.retail.children.find((c: any) => c.key === 'Paid Ads')?.val || 0) * 0.42).toLocaleString()}人），<strong>Google Ads</strong> 稳定输出占比 38%。
             </span>
           ) : (
             <span className="animate-in fade-in duration-500">
-              结构洞察：Retail 贡献 {data.retail.formatPct} 的新增，其中付费广告占比最高（{data.retail.children.find((c: any) => c.key === 'Paid Ads')?.pct}），KOL 贡献 {data.retail.children.find((c: any) => c.key === 'KOL')?.pct}，自然流量 {data.retail.children.find((c: any) => c.key === 'Organic')?.pct}，IB & Affiliate 贡献 {data.ib.formatPct}。
+              结构洞察：Retail 贡献 {data.retail.formatPct} 的新增，其中付费广告占比最高（{data.retail.children.find((c: any) => c.key === 'Paid Ads')?.pct || '0%'}），KOL 贡献 {data.retail.children.find((c: any) => c.key === 'KOL')?.pct || '0%'}，自然流量 {data.retail.children.find((c: any) => c.key === 'Organic')?.pct || '0%'}，IB & Affiliate 贡献 {data.ib.formatPct}。
             </span>
           )}
         </div>

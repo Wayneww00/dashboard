@@ -72,39 +72,6 @@ const dataRetentionMonthly = [
   { month: '12月', d7: 64.2, d30: 21.5, d7LastYear: 62.0, d30LastYear: 20.0 },
 ];
 
-const TooltipRetention = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-xs border border-gray-700 min-w-[140px]">
-        <div className="text-gray-400 mb-2 font-medium">2023年 {label}</div>
-        <div className="space-y-2">
-          <div>
-            <div className="flex justify-between items-center mb-0.5">
-              <span className="text-blue-400 font-bold">D7 留存:</span>
-              <span className="font-bold">{data.d7}%</span>
-            </div>
-            <div className="flex justify-between items-center text-[10px] text-gray-400">
-              <span>去年同期:</span>
-              <span>{data.d7LastYear}%</span>
-            </div>
-          </div>
-          <div className="pt-1 border-t border-gray-800">
-            <div className="flex justify-between items-center mb-0.5">
-              <span className="text-orange-400 font-bold">D30 留存:</span>
-              <span className="font-bold">{data.d30}%</span>
-            </div>
-            <div className="flex justify-between items-center text-[10px] text-gray-400">
-              <span>去年同期:</span>
-              <span>{data.d30LastYear}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
 
 const dataConversion1 = [
   { month: '1月', current: 18.6, lastMonth: 18.0, lastYear: 17.5, target: 22.0 }, { month: '2月', current: 19.3, lastMonth: 18.6, lastYear: 18.0, target: 22.0 },
@@ -132,101 +99,64 @@ const OKRLineShape = (props: any) => {
   return <line x1={cx - width/2} y1={cy} x2={cx + width/2} y2={cy} stroke="#1f2937" strokeWidth={2} />;
 };
 
-const TooltipB = ({ active, payload, label }: any) => {
+const GenericChartTooltip = ({ active, payload, label, valuePrefix = '', valueSuffix = '' }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const currentVal = data.current ?? data.value ?? data.actual;
+    const prevVal = data.lastMonth ?? data.previous;
+    const yoyVal = data.lastYear;
     return (
-      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-xs border border-gray-700 min-w-[120px]">
-        <div className="text-gray-400 mb-2 font-medium">2023年 {label}</div>
+      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-[11px] border border-gray-700 min-w-[140px]">
+        <div className="text-gray-400 mb-2 font-bold border-b border-gray-800 pb-1.5">{label}</div>
         <div className="flex justify-between mb-1">
-          <span className="text-gray-300">本月:</span>
-          <span className={`font-bold ${data.isUp ? 'text-rose-400' : 'text-emerald-400'}`}>{data.value}</span>
+          <span className="text-gray-300">当前:</span>
+          <span className="font-bold text-emerald-400">{valuePrefix}{currentVal}{valueSuffix}</span>
         </div>
+        {prevVal !== undefined && prevVal !== null && (
         <div className="flex justify-between mb-1">
-          <span className="text-gray-300">上月:</span>
-          <span className="font-bold text-white">{data.lastMonth}</span>
+          <span className="text-gray-300">上一周期:</span>
+          <span className="font-bold text-white">{valuePrefix}{prevVal}{valueSuffix}</span>
         </div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">去年:</span>
-          <span className="font-bold text-white">{data.lastYear}</span>
-        </div>
-        <div className="flex justify-between pt-1 border-t border-gray-700 mt-1">
-          <span className="text-gray-300">OKR目标:</span>
-          <span className="font-bold text-white">{data.okr}</span>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
-const TooltipC = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-xs border border-gray-700 min-w-[120px]">
-        <div className="text-gray-400 mb-2 font-medium">2023年 {label}</div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">实际:</span>
-          <span className="font-bold text-white">${data.actual}k</span>
-        </div>
-        {data.lastMonth !== null && (
-          <div className="flex justify-between mb-1">
-            <span className="text-gray-300">上月:</span>
-            <span className="font-bold text-gray-300">${data.lastMonth}k</span>
-          </div>
         )}
+        {yoyVal !== undefined && yoyVal !== null && (
         <div className="flex justify-between">
           <span className="text-gray-300">去年同期:</span>
-          <span className="font-bold text-gray-400">${data.lastYear}k</span>
+          <span className="font-bold text-white">{valuePrefix}{yoyVal}{valueSuffix}</span>
         </div>
+        )}
       </div>
     );
   }
   return null;
 };
 
-const TooltipD = ({ active, payload, label }: any) => {
+const TooltipRetention = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-xs border border-gray-700 min-w-[120px]">
-        <div className="text-gray-400 mb-2 font-medium">2023年 {label}</div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">本月:</span>
-          <span className="font-bold text-emerald-400">{data.current ?? data.value}</span>
-        </div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">上月:</span>
-          <span className="font-bold">{data.lastMonth}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-300">去年:</span>
-          <span className="font-bold">{data.lastYear}</span>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
-const TooltipConversion = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-xs border border-gray-700 min-w-[120px]">
-        <div className="text-gray-400 mb-2 font-medium">2023年 {label}</div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">本月:</span>
-          <span className="font-bold text-emerald-400">{data.current}%</span>
-        </div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">上月:</span>
-          <span className="font-bold">{data.lastMonth}%</span>
-        </div>
-        <div className="flex justify-between mb-1">
-          <span className="text-gray-300">去年:</span>
-          <span className="font-bold">{data.lastYear}%</span>
+      <div className="bg-gray-900 text-white p-3 rounded-xl shadow-xl text-[11px] border border-gray-700 min-w-[140px]">
+        <div className="text-gray-400 mb-2 font-bold border-b border-gray-800 pb-1.5">{label}</div>
+        <div className="space-y-2.5">
+          <div>
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-blue-400 font-bold">D7 当前:</span>
+              <span className="font-bold text-white">{data.d7}%</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px] text-gray-400">
+              <span>去年同期:</span>
+              <span>{data.d7LastYear}%</span>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-gray-800">
+            <div className="flex justify-between items-center mb-0.5">
+              <span className="text-orange-400 font-bold">D30 当前:</span>
+              <span className="font-bold text-white">{data.d30}%</span>
+            </div>
+            <div className="flex justify-between items-center text-[10px] text-gray-400">
+              <span>去年同期:</span>
+              <span>{data.d30LastYear}%</span>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -242,42 +172,68 @@ const CardWrapper = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const CardHeader = ({ title, tooltipText }: any) => (
+const CardHeader = ({ title }: any) => (
   <div className="flex justify-between items-start mb-2">
-    <div className="flex items-center gap-1.5 text-gray-500 relative group cursor-pointer">
+    <div className="flex items-center gap-1.5 text-gray-500">
       <span className="text-sm font-medium">{title}</span>
-      <Info className="w-3.5 h-3.5 opacity-50" />
-      {tooltipText && (
-        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-[10px] rounded shadow-xl z-20 whitespace-normal">
-          {tooltipText}
+    </div>
+  </div>
+);
+
+const getTrendConfig = (timeCtx: any, baseSeed: number) => {
+  let v1 = baseSeed, v2 = baseSeed * 2.3;
+
+  if (timeCtx.granularity === 'daily') {
+    v1 = baseSeed * 1.1; v2 = baseSeed * 1.8;
+  } else if (timeCtx.granularity === 'weekly') {
+    v1 = baseSeed * 1.4; v2 = baseSeed * 2.8;
+  } else if (timeCtx.diffDays > 300) {
+    v1 = baseSeed * 3.5; v2 = baseSeed * 7.2;
+  }
+
+  return {
+    timeCtx,
+    value1: `+${v1.toFixed(1)}%`,
+    value2: `+${v2.toFixed(1)}%`,
+  };
+};
+
+const CardValue = ({ value, timeCtx, value1, value2 }: any) => {
+  const isUp1 = value1.startsWith('+');
+  const isUp2 = value2.startsWith('+');
+  return (
+    <div className="mb-4">
+      <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">{value}</div>
+      <div className="flex items-center gap-2 text-xs font-medium text-gray-500 relative group cursor-help w-max">
+        <span className={`px-1.5 py-0.5 rounded ${isUp1 ? 'text-emerald-400 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
+          {timeCtx.label1} {value1}
+        </span>
+        <span className="text-gray-300">/</span>
+        <span className={`px-1.5 py-0.5 rounded ${isUp2 ? 'text-emerald-400 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
+          {timeCtx.label2} {value2}
+        </span>
+        
+        {/* Hover Badges Tooltip */}
+        <div className="absolute top-full left-0 mt-2 hidden group-hover:block w-72 bg-gray-900 text-white text-[10px] p-3.5 rounded-xl shadow-xl z-50 normal-case tracking-normal text-left border border-gray-800">
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between"><span className="text-gray-400 min-w-[80px]">当前期间:</span><span className="font-medium text-white">{timeCtx.currStr}</span></div>
+              <div className="flex justify-between"><span className="text-gray-400 min-w-[80px]">上一等宽周期:</span><span className="font-medium text-indigo-300">{timeCtx.prevStr}</span></div>
+              <div className="flex justify-between"><span className="text-gray-400 min-w-[80px]">去年同一期间:</span><span className="font-medium text-indigo-300">{timeCtx.yoyStr}</span></div>
+            </div>
+            <div className="absolute bottom-full left-6 border-4 border-transparent border-b-gray-900"></div>
         </div>
-      )}
+      </div>
     </div>
-  </div>
-);
-
-const CardValue = ({ value, mom, yoy }: any) => (
-  <div className="mb-4">
-    <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">{value}</div>
-    <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-      <span className={`px-1.5 py-0.5 rounded ${mom.startsWith('+') ? 'text-emerald-400 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
-        MoM {mom}
-      </span>
-      <span className="text-gray-300">/</span>
-      <span className={`px-1.5 py-0.5 rounded ${yoy.startsWith('+') ? 'text-emerald-400 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
-        YoY {yoy}
-      </span>
-    </div>
-  </div>
-);
+  );
+};
 
 
 
-const NetDepositChart = () => {
+const NetDepositChart = ({ scale, timeCtx }: { scale: number, timeCtx: any }) => {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const monthData = [
+  const rawMonthData = [
     { deposit: 4500, withdrawal: 2000, depositLastYear: 3800, withdrawalLastYear: 1800 },
     { deposit: 5200, withdrawal: 1800, depositLastYear: 4500, withdrawalLastYear: 1500 },
     { deposit: 4800, withdrawal: 3000, depositLastYear: 4200, withdrawalLastYear: 2800 },
@@ -291,22 +247,55 @@ const NetDepositChart = () => {
     { deposit: 11500, withdrawal: 4000, depositLastYear: 10500, withdrawalLastYear: 3800 },
     { deposit: 12500, withdrawal: 4800, depositLastYear: 11000, withdrawalLastYear: 4500 },
   ];
+  
+  const monthDataWithLabels = React.useMemo(() => {
+    let pointCount = rawMonthData.length;
+    if (timeCtx.granularity === 'daily') {
+      pointCount = Math.min(Math.max(timeCtx.diffDays, 7), 12);
+    } else if (timeCtx.granularity === 'weekly') {
+      pointCount = Math.min(Math.max(Math.ceil(timeCtx.diffDays / 7), 4), 12);
+    } else {
+      pointCount = 12;
+    }
+
+    return rawMonthData.slice(-pointCount).map((d, index) => {
+        let newLabel = '';
+        const offset = (pointCount - 1) - index; 
+        if (timeCtx.granularity === 'daily') {
+            const dt = new Date(timeCtx.end);
+            dt.setDate(dt.getDate() - offset);
+            newLabel = `${(dt.getMonth()+1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+        } else if (timeCtx.granularity === 'weekly') {
+            newLabel = `W${pointCount - offset}`; 
+        } else {
+            const dt = new Date(timeCtx.end);
+            dt.setMonth(dt.getMonth() - offset);
+            newLabel = `${dt.getMonth() + 1}月`;
+        }
+        return {
+          deposit: d.deposit * scale,
+          withdrawal: d.withdrawal * scale,
+          depositLastYear: d.depositLastYear * scale,
+          withdrawalLastYear: d.withdrawalLastYear * scale,
+          label: newLabel
+        }
+    });
+  }, [scale, timeCtx]);
 
   const width = 320;
   const height = 250;
-  const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
-  const maxVal = Math.max(...monthData.map(d => Math.max(d.deposit, d.withdrawal))) * 1.1;
+  const maxVal = Math.max(...monthDataWithLabels.map(d => Math.max(d.deposit, d.withdrawal))) * 1.1;
   const chartWidth = 120; 
   const barHeight = 13;
-  const gap = height / months.length;
+  const gap = height / monthDataWithLabels.length;
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const index = Math.floor((y / rect.height) * months.length);
-    if (index >= 0 && index < months.length) setActiveIndex(index);
+    const index = Math.floor((y / rect.height) * monthDataWithLabels.length);
+    if (index >= 0 && index < monthDataWithLabels.length) setActiveIndex(index);
   };
 
   return (
@@ -322,7 +311,7 @@ const NetDepositChart = () => {
         <text x={width/2 - 25} y={-15} textAnchor="end" className="fill-gray-400 text-[10px] font-bold tracking-wider">WITHDRAWAL (出金)</text>
         <text x={width/2 + 25} y={-15} textAnchor="start" className="fill-gray-400 text-[10px] font-bold tracking-wider">DEPOSIT (入金)</text>
 
-        {monthData.map((d, i) => {
+        {monthDataWithLabels.map((d, i) => {
           const yPos = i * gap + gap/2;
           const depWidth = (d.deposit / maxVal) * chartWidth;
           const withWidth = (d.withdrawal / maxVal) * chartWidth;
@@ -336,7 +325,7 @@ const NetDepositChart = () => {
                 textAnchor="middle" 
                 className={`text-[10px] font-bold ${isHovered ? 'fill-gray-900' : 'fill-gray-400'}`}
               >
-                {months[i]}
+                {d.label}
               </text>
 
               {/* Ghost Bar - Withdrawal (Last Year) */}
@@ -390,19 +379,19 @@ const NetDepositChart = () => {
             transform: 'translateY(-50%)'
           }}
         >
-          <div className="text-[10px] font-black text-gray-400 mb-2 uppercase">{months[activeIndex]} 详情数据</div>
+          <div className="text-[10px] font-black text-gray-400 mb-2 border-b border-gray-800 pb-1.5">{monthDataWithLabels[activeIndex].label}</div>
           <div className="space-y-1.5 min-w-[120px]">
             <div className="flex justify-between items-center text-xs">
               <span className="text-gray-300">入金:</span>
-              <span className="font-bold text-emerald-400">+${monthData[activeIndex].deposit.toLocaleString()}</span>
+              <span className="font-bold text-emerald-400">+${Math.floor(monthDataWithLabels[activeIndex].deposit).toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center text-xs">
               <span className="text-gray-300">出金:</span>
-              <span className="font-bold text-rose-400">-${monthData[activeIndex].withdrawal.toLocaleString()}</span>
+              <span className="font-bold text-rose-400">-${Math.floor(monthDataWithLabels[activeIndex].withdrawal).toLocaleString()}</span>
             </div>
             <div className="pt-1.5 border-t border-gray-700 flex justify-between items-center text-xs">
               <span className="text-white font-medium">净额:</span>
-              <span className="font-bold">${(monthData[activeIndex].deposit - monthData[activeIndex].withdrawal).toLocaleString()}</span>
+              <span className="font-bold">${Math.floor(monthDataWithLabels[activeIndex].deposit - monthDataWithLabels[activeIndex].withdrawal).toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -411,11 +400,11 @@ const NetDepositChart = () => {
   );
 };
 
-const RetentionChart = () => {
+const RetentionChart = ({ data }: { data: any[] }) => {
   return (
     <div className="flex-1 w-full min-h-[140px]">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={dataRetentionMonthly} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
+        <ComposedChart data={data} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
           <defs>
             <linearGradient id="colorD30" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#f97316" stopOpacity={0.1}/>
@@ -485,21 +474,178 @@ const RetentionChart = () => {
 };
 
 // --- Main Component ---
+import { useDashboardContext } from '../lib/DashboardContext';
+
+const renderShortDate = (d: Date) => `${d.getFullYear()}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getDate().toString().padStart(2, '0')}`;
 
 export default function KPICards() {
+  const { timeRange, selectedRegion, customDateRange } = useDashboardContext();
+  
+  const timeCtx = React.useMemo(() => {
+    const TODAY = new Date();
+    let start = new Date(TODAY);
+    let end = new Date(TODAY);
+
+    if (timeRange === 'today') {
+      start.setHours(0,0,0,0);
+    } else if (timeRange === 'yesterday') {
+      start.setDate(TODAY.getDate() - 1);
+      end.setDate(TODAY.getDate() - 1);
+      start.setHours(0,0,0,0);
+    } else if (timeRange === 'thisWeek') {
+      const day = TODAY.getDay() === 0 ? 6 : TODAY.getDay() - 1;
+      start.setDate(TODAY.getDate() - day);
+      start.setHours(0,0,0,0);
+    } else if (timeRange === 'mtd') {
+      start.setDate(1);
+      start.setHours(0,0,0,0);
+    } else if (timeRange === 'lastMonth') {
+      start.setMonth(TODAY.getMonth() - 1, 1);
+      start.setHours(0,0,0,0);
+      end = new Date(TODAY.getFullYear(), TODAY.getMonth(), 0);
+    } else if (timeRange === 'ytd') {
+      start.setMonth(0, 1);
+      start.setHours(0,0,0,0);
+    } else if (timeRange === 'last90') {
+      start.setDate(TODAY.getDate() - 90);
+      start.setHours(0,0,0,0);
+    } else if (timeRange === 'custom' && customDateRange?.start) {
+      start = new Date(customDateRange.start);
+      start.setHours(0,0,0,0);
+      end = new Date(customDateRange.end || customDateRange.start);
+    }
+    
+    end.setHours(23,59,59,999);
+
+    const diffDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+
+    let granularity = 'daily';
+    let subTitle = '按日趋势分布 (虚线为去年同日或等宽周期)';
+    let retSubTitle = '按日趋势分布 (橙代表D30，蓝代表D7)';
+    let cvSubTitle = '按日趋势分布 (前置节点与转化结果人数对比)';
+    if (diffDays > 14 && diffDays <= 84) {
+      granularity = 'weekly';
+      subTitle = '按周滚动趋势 (虚线为去年同周或等宽周期)';
+      retSubTitle = '按周滚动趋势 (橙代表D30，蓝代表D7)';
+      cvSubTitle = '按周滚动趋势 (前置节点与转化结果人数对比)';
+    } else if (diffDays > 84) {
+      granularity = 'monthly';
+      subTitle = '按月汇聚趋势 (虚线为去年同期或等宽周期)';
+      retSubTitle = '按月汇聚趋势 (橙代表D30，蓝代表D7)';
+      cvSubTitle = '按月汇聚趋势 (前置节点与转化结果人数对比)';
+    }
+
+    const prevStart = new Date(start);
+    prevStart.setDate(start.getDate() - diffDays);
+    const prevEnd = new Date(end);
+    prevEnd.setDate(end.getDate() - diffDays);
+
+    const yoyStart = new Date(start);
+    yoyStart.setFullYear(start.getFullYear() - 1);
+    const yoyEnd = new Date(end);
+    yoyEnd.setFullYear(end.getFullYear() - 1);
+
+    let label1 = 'PoP';
+    if (timeRange === 'today' || timeRange === 'yesterday') label1 = 'DoD';
+    else if (timeRange === 'thisWeek') label1 = 'WoW';
+    else if (timeRange === 'mtd' || timeRange === 'lastMonth') label1 = 'MoM';
+    else if (timeRange === 'ytd' || timeRange === 'last90') label1 = 'QoQ';
+
+    return {
+      diffDays, granularity, subTitle, retSubTitle, cvSubTitle,
+      currStr: `${renderShortDate(start)} 至 ${renderShortDate(end)}`,
+      prevStr: `${renderShortDate(prevStart)} 至 ${renderShortDate(prevEnd)}`,
+      yoyStr: `${renderShortDate(yoyStart)} 至 ${renderShortDate(yoyEnd)}`,
+      label1,
+      label2: 'YoY',
+      end
+    }
+  }, [timeRange, customDateRange]);
+
+  const remapChartData = React.useCallback((baseData: any[]) => {
+    // 动态计算该维度下应当显示的数据点数量
+    let pointCount = baseData.length;
+    if (timeCtx.granularity === 'daily') {
+      pointCount = Math.min(Math.max(timeCtx.diffDays, 7), 14); // 按日展现：最少7个点，最多14个点保持美观
+    } else if (timeCtx.granularity === 'weekly') {
+      pointCount = Math.min(Math.max(Math.ceil(timeCtx.diffDays / 7), 4), 12); // 按周展现：4-12周
+    } else {
+      pointCount = 12; // 按月展现：固定展示滚动12个月趋势
+    }
+
+    // 截取数据并生成新的标签
+    return baseData.slice(-pointCount).map((d, index) => {
+        let newLabel = d.month;
+        const offset = (pointCount - 1) - index; 
+        
+        if (timeCtx.granularity === 'daily') {
+            const dt = new Date(timeCtx.end);
+            dt.setDate(dt.getDate() - offset);
+            newLabel = `${(dt.getMonth()+1).toString().padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+        } else if (timeCtx.granularity === 'weekly') {
+            newLabel = `W${pointCount - offset}`; 
+        } else {
+            const dt = new Date(timeCtx.end);
+            dt.setMonth(dt.getMonth() - offset);
+            newLabel = `${dt.getMonth() + 1}月`;
+        }
+        return { ...d, month: newLabel };
+    });
+  }, [timeCtx]);
+
+  const dynDataA2 = React.useMemo(() => remapChartData(dataA2), [remapChartData]);
+  const dynDataB = React.useMemo(() => remapChartData(dataB), [remapChartData]);
+  const dynDataC = React.useMemo(() => remapChartData(dataC), [remapChartData]);
+  const dynDataConversion1 = React.useMemo(() => remapChartData(dataConversion1), [remapChartData]);
+  const dynDataConversion2 = React.useMemo(() => remapChartData(dataConversion2), [remapChartData]);
+  const dynDataRetentionMonthly = React.useMemo(() => remapChartData(dataRetentionMonthly), [remapChartData]);
+  
+  // Dynamic scale multiplier for demonstration of time dimension changes
+  const timeScale = {
+    today: 0.03,
+    yesterday: 0.035,
+    thisWeek: 0.21,
+    mtd: 1.0,
+    lastMonth: 0.95,
+    ytd: 4.8,
+    last90: 2.9,
+    custom: 1.2
+  }[timeRange] || 1.0;
+
+  const rScale: Record<string, number> = {
+    GLOBAL: 1.0,
+    ASIA_VN: 0.15,
+    EU_UK: 0.12,
+    ASIA_IN: 0.2,
+    MENA_AE: 0.08,
+    GS_AU: 0.06,
+  };
+  const regionScale = rScale[selectedRegion] || 0.04;
+
+  const m = timeScale * regionScale;
+
+  const trendA = getTrendConfig(timeCtx, 9.4);
+  const trendFTD = getTrendConfig(timeCtx, 12.2);
+  const trendFTT = getTrendConfig(timeCtx, 15.6);
+  const trendDep = getTrendConfig(timeCtx, 23.3);
+  const trendVol = getTrendConfig(timeCtx, 25.6);
+  const trendConv1 = getTrendConfig(timeCtx, 2.4);
+  const trendConv2 = getTrendConfig(timeCtx, 1.8);
+  const trendRet = getTrendConfig(timeCtx, 1.2);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
       
       {/* 1. 注册人数 */}
       <CardWrapper>
         <CardHeader title="注册人数" />
-        <CardValue value="12,480" mom="+9.4%" yoy="+21.8%" />
+        <CardValue value={Math.floor(12480 * m).toLocaleString()} {...trendA} />
         <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium">近12个月趋势（灰色虚线为去年同期）</span>
+          <span className="text-[10px] text-gray-400 font-medium">{timeCtx.subTitle}</span>
         </div>
         <div className="flex-1 w-full min-h-[80px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataA2} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+            <ComposedChart data={dynDataA2} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#34d399" stopOpacity={0.8}/>
@@ -507,7 +653,7 @@ export default function KPICards() {
                 </linearGradient>
               </defs>
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af', fontWeight: 600 }} dy={10} />
-              <Tooltip content={<TooltipD />} cursor={{ fill: '#f3f4f6' }} />
+              <Tooltip content={<GenericChartTooltip />} cursor={{ fill: '#f3f4f6' }} />
               <Bar dataKey="current" fill="url(#colorBar)" barSize={12} radius={[4, 4, 0, 0]} />
               <Line type="monotone" dataKey="lastMonth" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={false} />
             </ComposedChart>
@@ -518,13 +664,13 @@ export default function KPICards() {
       {/* 2. FTD人数 */}
       <CardWrapper>
         <CardHeader title="FTD人数" />
-        <CardValue value="2,995" mom="+9.4%" yoy="+22.2%" />
+        <CardValue value={Math.floor(2995 * m).toLocaleString()} {...trendFTD} />
         <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium">近12个月趋势（灰色虚线为去年同期）</span>
+          <span className="text-[10px] text-gray-400 font-medium">{timeCtx.subTitle}</span>
         </div>
         <div className="flex-1 w-full min-h-[80px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataB} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+            <ComposedChart data={dynDataB} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#34d399" stopOpacity={0.8}/>
@@ -532,7 +678,7 @@ export default function KPICards() {
                 </linearGradient>
               </defs>
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af', fontWeight: 600 }} dy={10} />
-              <Tooltip content={<TooltipD />} cursor={{ fill: '#f3f4f6' }} />
+              <Tooltip content={<GenericChartTooltip />} cursor={{ fill: '#f3f4f6' }} />
               <Bar dataKey="value" fill="url(#colorBar)" barSize={12} radius={[4, 4, 0, 0]} />
               <Line type="monotone" dataKey="lastMonth" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={false} />
             </ComposedChart>
@@ -543,13 +689,13 @@ export default function KPICards() {
       {/* 3. FTT人数 */}
       <CardWrapper>
         <CardHeader title="FTT人数" />
-        <CardValue value="1,497" mom="+9.4%" yoy="+26.9%" />
+        <CardValue value={Math.floor(1497 * m).toLocaleString()} {...trendFTT} />
         <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium">近12个月趋势（灰色虚线为去年同期）</span>
+          <span className="text-[10px] text-gray-400 font-medium">{timeCtx.subTitle}</span>
         </div>
         <div className="flex-1 w-full min-h-[80px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataB} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+            <ComposedChart data={dynDataB} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#34d399" stopOpacity={0.8}/>
@@ -557,7 +703,7 @@ export default function KPICards() {
                 </linearGradient>
               </defs>
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af', fontWeight: 600 }} dy={10} />
-              <Tooltip content={<TooltipD />} cursor={{ fill: '#f3f4f6' }} />
+              <Tooltip content={<GenericChartTooltip />} cursor={{ fill: '#f3f4f6' }} />
               <Bar dataKey="value" fill="url(#colorBar)" barSize={12} radius={[4, 4, 0, 0]} />
               <Line type="monotone" dataKey="lastMonth" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="4 4" dot={false} activeDot={false} />
             </ComposedChart>
@@ -567,47 +713,46 @@ export default function KPICards() {
 
       {/* 4. Net Deposit */}
       <CardWrapper>
-        <CardHeader title="Net Deposit (净入金)" tooltipText="月度净入金趋势" />
-        <CardValue value="$1,542,060" mom="+9.4%" yoy="+23.3%" />
+        <CardHeader title="Net Deposit (净入金)" />
+        <CardValue value={`$${Math.floor(1542060 * m).toLocaleString()}`} {...trendDep} />
         <div className="flex justify-between items-center px-1">
-          <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色阴影代表去年同期)</span>
+          <span className="text-[10px] text-gray-400 font-medium tracking-tight">{timeCtx.subTitle} (出金/入金对比)</span>
         </div>
         
-        <NetDepositChart />
+        <NetDepositChart scale={m} timeCtx={timeCtx} />
       </CardWrapper>
 
       {/* 5. 总交易量Trading Volume */}
       <CardWrapper>
         {/* 保真标题排版 */}
         <div className="flex justify-between items-start mb-2">
-          <div className="flex items-center gap-1.5 text-gray-400 cursor-pointer group relative">
+          <div className="flex items-center gap-1.5 text-gray-400">
             <span className="text-sm font-bold text-slate-700">总交易量</span>
             <span className="text-sm text-slate-500 font-medium">Trading Volume</span>
-            <Info className="w-3.5 h-3.5 opacity-40" />
           </div>
         </div>
         
         {/* 保真数值与标签排版 */}
         <div className="mb-4">
-          <div className="text-3xl font-black text-[#1a1f2e] tracking-tighter mb-2">$15,420,600</div>
+          <div className="text-3xl font-black text-[#1a1f2e] tracking-tighter mb-2">${Math.floor(15420600 * m).toLocaleString()}</div>
           <div className="flex items-center gap-3 text-[11px] font-bold">
             <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-400">
-              MoM +12.5%
+              {timeCtx.label1} {trendVol.value1}
             </span>
             <span className="text-slate-300 font-normal">/</span>
             <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-400">
-              YoY +25.6%
+              {timeCtx.label2} {trendVol.value2}
             </span>
           </div>
         </div>
         
         <div className="flex justify-between items-center mb-2 px-1">
-          <span className="text-[10px] text-gray-400 font-medium">近12个月趋势（灰色虚线为去年同期）</span>
+          <span className="text-[10px] text-gray-400 font-medium">{timeCtx.subTitle}</span>
         </div>
 
         <div className="flex-1 w-full min-h-[140px] mt-2">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataC} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+            <ComposedChart data={dynDataC} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
               <defs>
                 <linearGradient id="colorAreaVol" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.15}/>
@@ -622,7 +767,7 @@ export default function KPICards() {
                 dy={10} 
               />
               <Tooltip 
-                content={<TooltipC />} 
+                content={<GenericChartTooltip />} 
                 cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} 
               />
               
@@ -665,12 +810,12 @@ export default function KPICards() {
             </div>
             <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">24.0%</div>
             <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">MoM +2.4%</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">{timeCtx.label1} {trendConv1.value1}</span>
               <span className="text-gray-300">/</span>
-              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">YoY +3.9%</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">{timeCtx.label2} {trendConv1.value2}</span>
             </div>
             <div className="flex items-center px-1">
-              <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+              <span className="text-[10px] text-gray-400 font-medium tracking-tight">{timeCtx.cvSubTitle}</span>
             </div>
           </div>
           
@@ -680,7 +825,7 @@ export default function KPICards() {
                 <Landmark size={12} strokeWidth={2.5} />
                 <span className="text-[9px] font-black uppercase tracking-wider">注册人数</span>
               </div>
-              <span className="text-sm font-black text-slate-800">12,480</span>
+              <span className="text-sm font-black text-slate-800">{Math.floor(12480 * m).toLocaleString()}</span>
             </div>
             <div className="my-1.5 text-slate-300">
                <ArrowDown size={12} className="text-slate-300" />
@@ -690,13 +835,13 @@ export default function KPICards() {
                 <Wallet size={12} strokeWidth={2.5} />
                 <span className="text-[9px] font-black uppercase tracking-wider">FTD人数</span>
               </div>
-              <span className="text-sm font-black text-slate-800">2,995</span>
+              <span className="text-sm font-black text-slate-800">{Math.floor(2995 * m).toLocaleString()}</span>
             </div>
           </div>
         </div>
         <div className="flex-1 w-full min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataConversion1} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
+            <ComposedChart data={dynDataConversion1} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
               <defs>
                 <linearGradient id="colorConv1" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#34d399" stopOpacity={0.15}/>
@@ -706,7 +851,7 @@ export default function KPICards() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
               <YAxis hide domain={[0, 'auto']} />
-              <Tooltip content={<TooltipConversion />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
+              <Tooltip content={<GenericChartTooltip valueSuffix="%" />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
               <Area type="monotone" dataKey="current" stroke="none" fill="url(#colorConv1)" />
               <Line type="monotone" dataKey="lastYear" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 1.5, fill: '#94a3b8', stroke: 'none' }} activeDot={{ r: 4 }} />
               <Line type="monotone" dataKey="current" stroke="#34d399" strokeWidth={2.5} dot={{ r: 3.5, fill: '#34d399', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5, fill: '#34d399', strokeWidth: 2, stroke: '#fff' }} />
@@ -728,12 +873,12 @@ export default function KPICards() {
             </div>
             <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">50.0%</div>
             <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-2">
-              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">MoM +1.8%</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">{timeCtx.label1} {trendConv2.value1}</span>
               <span className="text-gray-300">/</span>
-              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">YoY +2.5%</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">{timeCtx.label2} {trendConv2.value2}</span>
             </div>
             <div className="flex justify-between items-center px-1">
-              <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (灰色虚线为去年同期)</span>
+              <span className="text-[10px] text-gray-400 font-medium tracking-tight">{timeCtx.cvSubTitle}</span>
             </div>
           </div>
           
@@ -743,7 +888,7 @@ export default function KPICards() {
                 <Wallet size={12} strokeWidth={2.5} />
                 <span className="text-[9px] font-black uppercase tracking-wider">FTD人数</span>
               </div>
-              <span className="text-sm font-black text-slate-800">2,995</span>
+              <span className="text-sm font-black text-slate-800">{Math.floor(2995 * m).toLocaleString()}</span>
             </div>
             <div className="my-1.5 text-slate-300">
                <ArrowDown size={12} className="text-slate-300" />
@@ -753,13 +898,13 @@ export default function KPICards() {
                 <BarChart2 size={12} strokeWidth={2.5} />
                 <span className="text-[9px] font-black uppercase tracking-wider">FTT人数</span>
               </div>
-              <span className="text-sm font-black text-slate-800">1,497</span>
+              <span className="text-sm font-black text-slate-800">{Math.floor(1497 * m).toLocaleString()}</span>
             </div>
           </div>
         </div>
         <div className="flex-1 w-full min-h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={dataConversion2} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
+            <ComposedChart data={dynDataConversion2} margin={{ top: 15, right: 10, left: 10, bottom: 5 }}>
               <defs>
                 <linearGradient id="colorConv2" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#f97316" stopOpacity={0.15}/>
@@ -769,7 +914,7 @@ export default function KPICards() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }} dy={10} />
               <YAxis hide domain={[0, 'auto']} />
-              <Tooltip content={<TooltipConversion />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
+              <Tooltip content={<GenericChartTooltip valueSuffix="%" />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
               <Area type="monotone" dataKey="current" stroke="none" fill="url(#colorConv2)" />
               <Line type="monotone" dataKey="lastYear" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 1.5, fill: '#94a3b8', stroke: 'none' }} activeDot={{ r: 4 }} />
               <Line type="monotone" dataKey="current" stroke="#f97316" strokeWidth={2.5} dot={{ r: 3.5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} />
@@ -782,23 +927,22 @@ export default function KPICards() {
       <CardWrapper>
         <div className="flex justify-between items-start mb-6">
           <div>
-            <div className="flex items-center gap-1.5 text-gray-500 relative group cursor-pointer mb-2">
+            <div className="flex items-center gap-1.5 text-gray-500 mb-2">
               <span className="text-sm font-medium">FTT后 D30 留存率</span>
-              <Info className="w-3.5 h-3.5 opacity-50" />
             </div>
             <div className="text-3xl font-bold text-gray-900 tracking-tight mb-2">20.0%</div>
             <div className="flex items-center gap-2 text-xs font-medium text-gray-500 mb-2">
-              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">MoM +1.2%</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">{timeCtx.label1} {trendRet.value1}</span>
               <span className="text-gray-300">/</span>
-              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">YoY +2.0%</span>
+              <span className="px-1.5 py-0.5 rounded text-emerald-400 bg-emerald-50">{timeCtx.label2} {trendRet.value2}</span>
             </div>
             <div className="flex justify-between items-center px-1">
-              <span className="text-[10px] text-gray-400 font-medium tracking-tight">近12个月趋势 (橙色代表D30，蓝色代表D7，虚线代表去年同期)</span>
+              <span className="text-[10px] text-gray-400 font-medium tracking-tight">{timeCtx.retSubTitle}</span>
             </div>
           </div>
         </div>
 
-        <RetentionChart />
+        <RetentionChart data={dynDataRetentionMonthly} />
       </CardWrapper>
 
     </div>

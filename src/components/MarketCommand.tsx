@@ -11,11 +11,24 @@ import {
   Activity,
   BarChart3
 } from 'lucide-react';
+import { useDashboardContext } from '../lib/DashboardContext';
 
 const MarketCommand = () => {
   const [activeTab, setActiveTab] = useState('ASO'); // ASO, GEO, SEO
   const [mode, setMode] = useState('Absolute'); // Absolute (绝对值), Growth (增速)
   const [hoveredCountry, setHoveredCountry] = useState<any>(null);
+  const { timeRange, selectedRegion } = useDashboardContext();
+
+  // Dynamic scale multipliers
+  const timeScale = {
+    today: 0.03, yesterday: 0.035, thisWeek: 0.21, mtd: 1.0, lastMonth: 0.95, ytd: 4.8, last90: 2.9, custom: 1.2
+  }[timeRange] || 1.0;
+
+  const rScale: Record<string, number> = {
+    GLOBAL: 1.0, ASIA_VN: 0.15, EU_UK: 0.12, ASIA_IN: 0.2, MENA_AE: 0.08, GS_AU: 0.06,
+  };
+  const regionScale = rScale[selectedRegion] || 0.04;
+  const m = timeScale * regionScale;
 
   // 1. 核心指标配置 (定义不同 Tab 下的文案和图标)
   const config: any = {
@@ -44,30 +57,34 @@ const MarketCommand = () => {
 
   const activeConfig = config[activeTab];
 
-  // 2. 模拟国家数据
-  const countriesData = useMemo(() => [
-    { id: 'US', name: '美国', coords: { top: '38%', left: '22%' }, tier: 1, aso: { val: 2800, delta: 85, growth: 3.1 }, geo: { val: 92, delta: 2, growth: 2.2 }, seo: { val: 3200, delta: 120, growth: 3.8 }, comps: ['Exness', 'Capital.com'] },
-    { id: 'CA', name: '加拿大', coords: { top: '25%', left: '22%' }, tier: 2, aso: { val: 850, delta: -12, growth: -1.4 }, geo: { val: 85, delta: -1, growth: -1.2 }, seo: { val: 920, delta: 25, growth: 2.8 }, comps: ['Plus500', 'Capital.com'] },
-    { id: 'MX', name: '墨西哥', coords: { top: '48%', left: '20%' }, tier: 2, aso: { val: 720, delta: -45, growth: -5.9 }, geo: { val: 55, delta: -4, growth: -6.7 }, seo: { val: 410, delta: -12, growth: -2.8 }, comps: ['CFI', 'Exness'] },
-    { id: 'GB', name: '英国', coords: { top: '28%', left: '48.5%' }, tier: 1, aso: { val: 1100, delta: 15, growth: 1.4 }, geo: { val: 89, delta: 1, growth: 1.1 }, seo: { val: 1350, delta: 45, growth: 3.4 }, comps: ['Capital.com', 'Plus500'] },
-    { id: 'DE', name: '德国', coords: { top: '29%', left: '52%' }, tier: 1, aso: { val: 1400, delta: -35, growth: -2.4 }, geo: { val: 82, delta: -3, growth: -3.5 }, seo: { val: 1650, delta: -20, growth: -1.2 }, comps: ['Plus500', 'Capital.com'] },
-    { id: 'FR', name: '法国', coords: { top: '32%', left: '49.5%' }, tier: 2, aso: { val: 820, delta: 20, growth: 2.5 }, geo: { val: 78, delta: 2, growth: 2.6 }, seo: { val: 980, delta: 40, growth: 4.3 }, comps: ['Exness', 'CFI'] },
-    { id: 'ES', name: '西班牙', coords: { top: '36%', left: '48%' }, tier: 2, aso: { val: 650, delta: -12, growth: -1.8 }, geo: { val: 72, delta: -1, growth: -1.4 }, seo: { val: 710, delta: 15, growth: 2.1 }, comps: ['Plus500', 'Exness'] },
-    { id: 'CN', name: '中国', coords: { top: '38%', left: '78%' }, tier: 1, aso: { val: 3200, delta: 210, growth: 7.0 }, geo: { val: 88, delta: 2, growth: 2.3 }, seo: { val: 4500, delta: 380, growth: 9.2 }, comps: ['Exness', 'Capital.com'] },
-    { id: 'JP', name: '日本', coords: { top: '37%', left: '86%' }, tier: 1, aso: { val: 1950, delta: -85, growth: -4.2 }, geo: { val: 78, delta: -5, growth: -6.0 }, seo: { val: 1210, delta: -35, growth: -2.8 }, comps: ['Exness', 'CFI'] },
-    { id: 'IN', name: '印度', coords: { top: '48%', left: '71%' }, tier: 1, aso: { val: 2450, delta: 320, growth: 15.0 }, geo: { val: 72, delta: 14, growth: 24.1 }, seo: { val: 1850, delta: 280, growth: 17.8 }, comps: ['PU Prime', 'Exness'] },
-    { id: 'VN', name: '越南', coords: { top: '52%', left: '79%' }, tier: 2, aso: { val: 1850, delta: 350, growth: 23.3 }, geo: { val: 75, delta: 18, growth: 31.6 }, seo: { val: 920, delta: 145, growth: 18.7 }, comps: ['PU Prime', 'Exness'] },
-    { id: 'ID', name: '印尼', coords: { top: '62%', left: '81%' }, tier: 2, aso: { val: 1600, delta: 120, growth: 8.1 }, geo: { val: 68, delta: 5, growth: 7.9 }, seo: { val: 840, delta: 60, growth: 7.7 }, comps: ['Exness', 'CFI'] },
-    { id: 'AE', name: '阿联酋', coords: { top: '47%', left: '63%' }, tier: 2, aso: { val: 1550, delta: 245, growth: 18.8 }, geo: { val: 94, delta: 4, growth: 4.4 }, seo: { val: 1250, delta: 180, growth: 16.8 }, comps: ['Exness', 'CFI'] },
-    { id: 'SA', name: '沙特', coords: { top: '46%', left: '60%' }, tier: 2, aso: { val: 1200, delta: 100, growth: 9.1 }, geo: { val: 82, delta: 6, growth: 7.9 }, seo: { val: 950, delta: 85, growth: 9.8 }, comps: ['CFI', 'Exness'] },
-    { id: 'TR', name: '土耳其', coords: { top: '36%', left: '57%' }, tier: 2, aso: { val: 920, delta: 145, growth: 18.7 }, geo: { val: 68, delta: 12, growth: 21.4 }, seo: { val: 1150, delta: 210, growth: 22.3 }, comps: ['Exness', 'CFI'] },
-    { id: 'ZA', name: '南非', coords: { top: '75%', left: '54%' }, tier: 3, aso: { val: 450, delta: -20, growth: -4.2 }, geo: { val: 52, delta: -2, growth: -3.7 }, seo: { val: 380, delta: -15, growth: -3.8 }, comps: ['Capital.com', 'Exness'] },
-    { id: 'NG', name: '尼日利亚', coords: { top: '55%', left: '51%' }, tier: 3, aso: { val: 680, delta: 95, growth: 16.2 }, geo: { val: 45, delta: 8, growth: 21.6 }, seo: { val: 520, delta: 70, growth: 15.5 }, comps: ['Exness', 'PU Prime'] },
-    { id: 'BR', name: '巴西', coords: { top: '65%', left: '32%' }, tier: 1, aso: { val: 1250, delta: 110, growth: 9.6 }, geo: { val: 65, delta: 5, growth: 8.3 }, seo: { val: 580, delta: 62, growth: 12.0 }, comps: ['CFI', 'PU Prime'] },
-    { id: 'AR', name: '阿根廷', coords: { top: '80%', left: '30%' }, tier: 3, aso: { val: 320, delta: 45, growth: 16.4 }, geo: { val: 42, delta: 8, growth: 23.5 }, seo: { val: 210, delta: 30, growth: 16.7 }, comps: ['Exness', 'CFI'] },
-    { id: 'RU', name: '俄罗斯', coords: { top: '20%', left: '70%' }, tier: 1, aso: { val: 1650, delta: -180, growth: -9.8 }, geo: { val: 58, delta: -12, growth: -17.2 }, seo: { val: 1900, delta: -50, growth: -2.6 }, comps: ['Exness', 'CFI'] },
-    { id: 'AU', name: '澳大利亚', coords: { top: '75%', left: '88%' }, tier: 2, aso: { val: 820, delta: 8, growth: 0.9 }, geo: { val: 88, delta: 0, growth: 0.0 }, seo: { val: 950, delta: 35, growth: 3.8 }, comps: ['Plus500', 'Capital.com'] }
-  ], []);
+  // 2. 模拟国家数据 (包含所有需要的国家) - 注入动态放缩 m
+  const allCountries = useMemo(() => [
+    { id: 'US', name: '美国', coords: { top: '38%', left: '22%' }, tier: 1, aso: { val: Math.round(2800 * m), delta: Math.round(85 * m), growth: 3.1 }, geo: { val: 92, delta: 2, growth: 2.2 }, seo: { val: Math.round(3200 * m), delta: Math.round(120 * m), growth: 3.8 }, comps: ['Exness', 'Capital.com'] },
+    { id: 'IN', name: '印度', coords: { top: '48%', left: '71%' }, tier: 1, aso: { val: Math.round(2450 * m), delta: Math.round(320 * m), growth: 15.0 }, geo: { val: 72, delta: 14, growth: 24.1 }, seo: { val: Math.round(1850 * m), delta: Math.round(280 * m), growth: 17.8 }, comps: ['PU Prime', 'Exness'] },
+    { id: 'VN', name: '越南', coords: { top: '52%', left: '79%' }, tier: 2, aso: { val: Math.round(1850 * m), delta: Math.round(350 * m), growth: 23.3 }, geo: { val: 75, delta: 18, growth: 31.6 }, seo: { val: Math.round(920 * m), delta: Math.round(145 * m), growth: 18.7 }, comps: ['PU Prime', 'Exness'] },
+    { id: 'AE', name: '阿联酋', coords: { top: '47%', left: '63%' }, tier: 2, aso: { val: Math.round(1550 * m), delta: Math.round(245 * m), growth: 18.8 }, geo: { val: 94, delta: 4, growth: 4.4 }, seo: { val: Math.round(1250 * m), delta: Math.round(180 * m), growth: 16.8 }, comps: ['Exness', 'CFI'] },
+    { id: 'AU', name: '澳大利亚', coords: { top: '75%', left: '88%' }, tier: 2, aso: { val: Math.round(820 * m), delta: Math.round(8 * m), growth: 0.9 }, geo: { val: 88, delta: 0, growth: 0.0 }, seo: { val: Math.round(950 * m), delta: Math.round(35 * m), growth: 3.8 }, comps: ['Plus500', 'Capital.com'] },
+    { id: 'GB', name: '英国', coords: { top: '28%', left: '48.5%' }, tier: 1, aso: { val: Math.round(1100 * m), delta: Math.round(15 * m), growth: 1.4 }, geo: { val: 89, delta: 1, growth: 1.1 }, seo: { val: Math.round(1350 * m), delta: Math.round(45 * m), growth: 3.4 }, comps: ['Capital.com', 'Plus500'] },
+    { id: 'JP', name: '日本', coords: { top: '37%', left: '86%' }, tier: 1, aso: { val: Math.round(1950 * m), delta: Math.round(-85 * m), growth: -4.2 }, geo: { val: 78, delta: -5, growth: -6.0 }, seo: { val: Math.round(1210 * m), delta: Math.round(-35 * m), growth: -2.8 }, comps: ['Exness', 'CFI'] },
+    { id: 'TH', name: '泰国', coords: { top: '55%', left: '77%' }, tier: 2, aso: { val: Math.round(1450 * m), delta: Math.round(180 * m), growth: 14.2 }, geo: { val: 71, delta: 6, growth: 9.2 }, seo: { val: Math.round(1100 * m), delta: Math.round(95 * m), growth: 9.4 }, comps: ['Exness', 'XM'] },
+    { id: 'MY', name: '马来西亚', coords: { top: '60%', left: '77.5%' }, tier: 2, aso: { val: Math.round(1280 * m), delta: Math.round(90 * m), growth: 7.5 }, geo: { val: 68, delta: 4, growth: 6.2 }, seo: { val: Math.round(1150 * m), delta: Math.round(120 * m), growth: 11.6 }, comps: ['Exness', 'FXTM'] },
+    { id: 'RU', name: '俄罗斯', coords: { top: '20%', left: '70%' }, tier: 1, aso: { val: Math.round(1650 * m), delta: Math.round(-180 * m), growth: -9.8 }, geo: { val: 58, delta: -12, growth: -17.2 }, seo: { val: Math.round(1900 * m), delta: Math.round(-50 * m), growth: -2.6 }, comps: ['Exness', 'CFI'] },
+    { id: 'PK', name: '巴基斯坦', coords: { top: '45%', left: '68%' }, tier: 2, aso: { val: Math.round(980 * m), delta: Math.round(140 * m), growth: 16.7 }, geo: { val: 45, delta: 3, growth: 7.1 }, seo: { val: Math.round(620 * m), delta: Math.round(45 * m), growth: 7.8 }, comps: ['Exness', 'XM'] },
+    { id: 'ID', name: '印尼', coords: { top: '62%', left: '81%' }, tier: 2, aso: { val: Math.round(1600 * m), delta: Math.round(120 * m), growth: 8.1 }, geo: { val: 68, delta: 5, growth: 7.9 }, seo: { val: Math.round(840 * m), delta: Math.round(60 * m), growth: 7.7 }, comps: ['Exness', 'CFI'] },
+    { id: 'PH', name: '菲律宾', coords: { top: '50%', left: '83%' }, tier: 2, aso: { val: Math.round(1200 * m), delta: Math.round(110 * m), growth: 10.1 }, geo: { val: 62, delta: 4, growth: 6.9 }, seo: { val: Math.round(750 * m), delta: Math.round(55 * m), growth: 7.9 }, comps: ['Exness', 'XM'] },
+    { id: 'CO', name: '哥伦比亚', coords: { top: '52%', left: '28%' }, tier: 2, aso: { val: Math.round(560 * m), delta: Math.round(45 * m), growth: 8.7 }, geo: { val: 41, delta: 2, growth: 5.1 }, seo: { val: Math.round(380 * m), delta: Math.round(20 * m), growth: 5.6 }, comps: ['Exness', 'XM'] },
+    { id: 'SA', name: '沙特', coords: { top: '46%', left: '60%' }, tier: 2, aso: { val: Math.round(1200 * m), delta: Math.round(100 * m), growth: 9.1 }, geo: { val: 82, delta: 6, growth: 7.9 }, seo: { val: Math.round(950 * m), delta: Math.round(85 * m), growth: 9.8 }, comps: ['CFI', 'Exness'] }
+  ], [m]);
+
+  // 根据当前 Tab 过滤展示的国家
+  const countriesData = useMemo(() => {
+    const geoList = ['US', 'IN', 'VN', 'AE', 'AU', 'GB', 'JP', 'TH', 'MY', 'RU'];
+    const asoList = ['PK', 'TH', 'ID', 'PH', 'VN', 'JP', 'GB', 'AE', 'AU', 'CO'];
+    const seoList = ['VN', 'TH', 'IN', 'MY', 'AE', 'RU', 'SA'];
+
+    const activeList = activeTab === 'GEO' ? geoList : activeTab === 'ASO' ? asoList : seoList;
+    return allCountries.filter(c => activeList.includes(c.id));
+  }, [activeTab, allCountries]);
 
   // 3. 动态计算气泡样式
   const getMarkerStyle = (country: any) => {

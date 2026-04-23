@@ -10,9 +10,12 @@ import AppMarketOverview from './components/AppMarketOverview';
 import GlobalIntelligence from './components/GlobalIntelligence';
 import MarketCommand from './components/MarketCommand';
 import AIAlertDrawer from './components/AIAlertDrawer';
-import { Calendar, Download, Bell, Sparkles } from 'lucide-react';
+import CLevelTimePicker from './components/CLevelTimePicker';
+import GlobalRegionPicker from './components/GlobalRegionPicker';
+import { Calendar, Bell, Sparkles } from 'lucide-react';
+import { DashboardProvider } from './lib/DashboardContext';
 
-export default function App() {
+function DashboardContent() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState(false);
 
@@ -21,17 +24,15 @@ export default function App() {
       <div className="max-w-[1600px] mx-auto space-y-6">
         
         {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <header className="sticky top-0 md:top-4 z-[90] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/90 backdrop-blur-lg p-4 rounded-xl shadow-sm border border-gray-100/50">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Copilot Data Dashboard</h1>
             <p className="text-sm text-gray-500 mt-1">Real-time marketing performance & user insights</p>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg text-sm font-medium text-gray-700">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span>Last 30 Days</span>
-            </div>
+            <GlobalRegionPicker />
+            <CLevelTimePicker />
             <button 
               onClick={() => setIsAlertDrawerOpen(true)}
               className="relative p-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
@@ -41,10 +42,6 @@ export default function App() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 border-2 border-white"></span>
               </span>
-            </button>
-            <button className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors shadow-sm">
-              <Download className="w-4 h-4" />
-              <span>Export PDF</span>
             </button>
             <button 
               onClick={() => setIsAIModalOpen(true)}
@@ -108,5 +105,13 @@ export default function App() {
       <AIDiagnosticModal isOpen={isAIModalOpen} onClose={() => setIsAIModalOpen(false)} />
       <AIAlertDrawer isOpen={isAlertDrawerOpen} onClose={() => setIsAlertDrawerOpen(false)} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <DashboardProvider>
+      <DashboardContent />
+    </DashboardProvider>
   );
 }

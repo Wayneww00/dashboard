@@ -121,12 +121,6 @@ export default function MarketExposureASO() {
             <SectionHeader 
               title="关键词覆盖与排名" 
               icon={Search} 
-              rightContent={
-                <div className="flex items-center gap-1 text-slate-400">
-                  <Calendar size={10} />
-                  <span className="text-[9px] font-bold">L12M Trend</span>
-                </div>
-              }
             />
             
             <div className="grid grid-cols-2 gap-3 mb-4">
@@ -230,7 +224,7 @@ export default function MarketExposureASO() {
           {/* 3. Semantic Core Matrix */}
           <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm relative">
             <SectionHeader 
-              title="Semantic Core Matrix" 
+              title="关键词展示矩阵" 
               icon={Target} 
               rightContent={<Activity size={12} className="text-cyan-500 animate-pulse" />}
             />

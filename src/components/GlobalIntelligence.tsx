@@ -25,6 +25,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { useDashboardContext } from '../lib/DashboardContext';
 
 import MarketExposureASO from './MarketExposureASO';
 
@@ -95,12 +96,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const GlobalIntelligence = () => {
   const [activeTab, setActiveTab] = useState('ASO');
-  const [region, setRegion] = useState('Global');
   const [selectedBrand, setSelectedBrand] = useState('Vantage');
+  const { timeRange, selectedRegion } = useDashboardContext();
 
-  const regions = ['Global', 'EU', 'Mena', 'Latam', 'Asia', 'Africa', 'Others'];
+  const timeScale = {
+    today: 0.03, yesterday: 0.035, thisWeek: 0.21, mtd: 1.0, lastMonth: 0.95, ytd: 4.8, last90: 2.9, custom: 1.2
+  }[timeRange] || 1.0;
 
-  const seoRegionData: Record<string, any> = {
+  const rScale: Record<string, number> = {
+    GLOBAL: 1.0, ASIA_VN: 0.15, EU_UK: 0.12, ASIA_IN: 0.2, MENA_AE: 0.08, GS_AU: 0.06,
+  };
+  const regionScale = rScale[selectedRegion] || 0.04;
+  const m = timeScale * regionScale;
+
+  // We map the global multi-region to a simplified category structure here 
+  // since the SEO data expects generic buckets
+  const regionBucket = selectedRegion === 'GLOBAL' ? 'Global' :
+                       selectedRegion.startsWith('ASIA') ? 'Asia' :
+                       selectedRegion.startsWith('EU') ? 'EU' :
+                       selectedRegion.startsWith('LATAM') ? 'Latam' :
+                       selectedRegion.startsWith('MENA') ? 'Mena' :
+                       selectedRegion.startsWith('AFRICA') ? 'Africa' : 'Others';
+
+  const baseSeoData: Record<string, any> = {
     'Global': {
       kpis: {
         authorityScore: { value: 92, change: 5, status: '优秀', percentile: '92%' },
@@ -128,7 +146,24 @@ const GlobalIntelligence = () => {
     'Others': { kpis: { authorityScore: { value: 55, change: 0.2, status: '平稳', percentile: '45%' }, organicTraffic: { value: 1.5, change: 0.5 }, organicKeywords: { value: 1.2, change: 0.3 }, paidTraffic: { value: 0.2, change: -0.1 }, paidKeywords: { value: 0.1, change: 0 } }, chart: Array.from({ length: 12 }, (_, i) => ({ month: `${i + 1}月`, brand: 1 + i, organic: 1 + i, paid: 0.2 })) },
   };
 
-  const currentSeoData = seoRegionData[region] || seoRegionData['Global'];
+  const rawSeoData = baseSeoData[regionBucket] || baseSeoData['Global'];
+  
+  // Scale the local KPI properties
+  const currentSeoData = {
+    kpis: {
+        authorityScore: rawSeoData.kpis.authorityScore, // Score doesn't scale linearly with traffic
+        organicTraffic: { value: Math.round((rawSeoData.kpis.organicTraffic.value * m) * 10) / 10, change: rawSeoData.kpis.organicTraffic.change },
+        organicKeywords: { value: Math.round((rawSeoData.kpis.organicKeywords.value * m) * 10) / 10, change: rawSeoData.kpis.organicKeywords.change },
+        paidTraffic: { value: Math.round((rawSeoData.kpis.paidTraffic.value * m) * 10) / 10, change: rawSeoData.kpis.paidTraffic.change },
+        paidKeywords: { value: Math.round((rawSeoData.kpis.paidKeywords.value * m) * 10) / 10, change: rawSeoData.kpis.paidKeywords.change }
+    },
+    chart: rawSeoData.chart.map((pt: any) => ({
+      ...pt,
+      brand: pt.brand * m,
+      organic: pt.organic * m,
+      paid: pt.paid * m
+    }))
+  };
 
   const brands = [
     { rank: 1, name: 'Vantage', change: '+5%', changeType: 'up', score: '92%' },
@@ -172,7 +207,14 @@ const GlobalIntelligence = () => {
   };
 
   const currentBrandData = brands.find(b => b.name === selectedBrand) || brands[0];
-  const currentTrendData = visibilityTrendData[selectedBrand as keyof typeof visibilityTrendData];
+  const vantageTrend = visibilityTrendData['Vantage'];
+  const compTrend = selectedBrand !== 'Vantage' ? visibilityTrendData[selectedBrand as keyof typeof visibilityTrendData] : null;
+
+  const combinedTrendData = vantageTrend.map((v, i) => ({
+    time: v.time,
+    vantage: v.value,
+    comp: compTrend ? compTrend[i].value : undefined
+  }));
 
   // --- SEO/GEO 模拟数据 ---
   const trafficSeries = [
@@ -207,27 +249,11 @@ const GlobalIntelligence = () => {
           <div>
             <h2 className="text-lg font-black text-gray-900 tracking-tight">市场曝光度</h2>
             <div className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
-              <MapPin size={10} /> {region.toUpperCase()} SNAPSHOT
+              <MapPin size={10} /> {regionBucket.toUpperCase()} SNAPSHOT
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* 地区选择 Dropdown */}
-          <div className="relative group">
-            <select 
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-[10px] font-bold uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 transition-all cursor-pointer hover:bg-slate-100"
-            >
-              {regions.map(r => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-slate-600 transition-colors">
-              <ChevronDown size={14} />
-            </div>
-          </div>
-
           <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
             {['ASO', 'SEO', 'GEO'].map(tab => (
               <button
@@ -392,50 +418,86 @@ const GlobalIntelligence = () => {
             </div>
 
             {/* Visibility Score Trend (Image 3 left) */}
-            <div className="bg-gray-900 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative overflow-hidden">
               <div className="flex justify-between items-start mb-4 relative z-10">
                 <div>
                   <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Visibility score</div>
-                  <div className="text-xl font-black text-white">{currentBrandData.score}</div>
-                </div>
-                <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md ${currentBrandData.changeType === 'up' ? 'text-emerald-400 bg-emerald-400/10' : 'text-rose-400 bg-rose-400/10'}`}>
-                  {currentBrandData.changeType === 'up' ? <TrendingUp size={12} /> : <TrendingDown size={12} />} 
-                  {currentBrandData.change.replace('+', '').replace('-', '')} <span className="text-gray-400 ml-1">vs last week</span>
+                  <div className="flex items-center gap-6">
+                    <div className="text-xl font-black text-gray-900">{currentBrandData.score}</div>
+                    {selectedBrand !== 'Vantage' && (
+                      <div className="flex items-center gap-3 text-[10px] font-bold">
+                         <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-400"></div> <span className="text-gray-600">Vantage</span></div>
+                         <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-purple-500"></div> <span className="text-gray-600">{selectedBrand}</span></div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="h-40 mt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={currentTrendData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+                  <AreaChart data={combinedTrendData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
                     <defs>
-                      <linearGradient id="colorVis" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e'} stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor={currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e'} stopOpacity={0}/>
+                      <linearGradient id="colorVisGreen" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#34d399" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#34d399" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#374151" opacity={0.5} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={true} stroke="#f1f5f9" />
                     <XAxis 
                       dataKey="time" 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#9ca3af', fontSize: 10 }} 
+                      tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }} 
                       dy={10}
-                      interval="preserveStartEnd"
                     />
                     <YAxis 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#9ca3af', fontSize: 10 }} 
+                      tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }} 
                       tickFormatter={(value) => `${value}%`}
                       domain={[0, 100]}
-                      ticks={[0, 25, 50, 75, 100]}
+                      ticks={[0, 50, 100]}
                     />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem', color: '#f3f4f6', fontSize: '12px', fontWeight: 'bold' }}
-                      itemStyle={{ color: currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e' }}
-                      formatter={(value: number) => [`${value}%`, 'Score']}
-                      labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
+                      cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5 }} 
+                      content={(props: any) => {
+                        if (props.active && props.payload && props.payload.length) {
+                           return (
+                             <div className="bg-white p-3 rounded-xl shadow-xl border border-gray-100 min-w-[120px]">
+                               <div className="text-[10px] font-bold text-slate-400 mb-2 pb-1 border-b border-slate-50 uppercase tracking-widest">{props.label} 分数</div>
+                               <div className="space-y-1.5">
+                                 {props.payload.map((entry: any, index: number) => {
+                                    const isComp = entry.dataKey === 'comp';
+                                    const name = isComp ? selectedBrand : 'Vantage';
+                                    const color = isComp ? '#8b5cf6' : '#34d399';
+                                    return (
+                                      <div key={index} className="flex justify-between items-center gap-4">
+                                        <div className="flex items-center gap-1.5">
+                                          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }}></div>
+                                          <span className="text-[10px] font-bold text-slate-600">{name}</span>
+                                        </div>
+                                        <span className="text-xs font-black text-slate-900">{entry.value}%</span>
+                                      </div>
+                                    );
+                                 })}
+                               </div>
+                             </div>
+                           );
+                        }
+                        return null;
+                      }} 
                     />
-                    <Area type="monotone" dataKey="value" stroke={currentBrandData.changeType === 'up' ? '#34d399' : '#f43f5e'} strokeWidth={2} fillOpacity={1} fill="url(#colorVis)" />
+                    {compTrend && (
+                      <Area 
+                        type="monotone" 
+                        dataKey="comp" 
+                        stroke="#8b5cf6" 
+                        strokeWidth={2} 
+                        fill="transparent" 
+                        strokeDasharray="4 4"
+                      />
+                    )}
+                    <Area type="monotone" dataKey="vantage" stroke="#34d399" strokeWidth={3} fillOpacity={1} fill="url(#colorVisGreen)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -443,7 +505,10 @@ const GlobalIntelligence = () => {
 
             {/* Brand Industry Ranking (Image 3 right) */}
             <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex-1">
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Brand Industry Ranking</div>
+              <div className="flex flex-col mb-4">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Brand Industry Ranking</div>
+                <span className="text-[9px] text-gray-400 mt-1">点击下方竞品可将数据添加至上方趋势图进行对比分析</span>
+              </div>
               <div className="space-y-1">
                 {brands.map((brand, idx) => (
                   <div 
